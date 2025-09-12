@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		331325ED2E6E869200E86E52 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,11 +31,25 @@
 		331325DF2E6E869100E86E52 /* carkey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carkey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		331325EC2E6E869200E86E52 /* carkeyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = carkeyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331325F62E6E869200E86E52 /* carkeyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = carkeyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		335DD43D2E74427F00B0CE75 /* Exceptions for "carkey" folder in "carkey" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 331325DE2E6E869100E86E52 /* carkey */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		331325E12E6E869100E86E52 /* carkey */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				335DD43D2E74427F00B0CE75 /* Exceptions for "carkey" folder in "carkey" target */,
+			);
 			path = carkey;
 			sourceTree = "<group>";
 		};
@@ -52,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +97,7 @@
 				331325E12E6E869100E86E52 /* carkey */,
 				331325EF2E6E869200E86E52 /* carkeyTests */,
 				331325F92E6E869200E86E52 /* carkeyUITests */,
+				335DD4392E74426100B0CE75 /* Frameworks */,
 				331325E02E6E869100E86E52 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +110,14 @@
 				331325F62E6E869200E86E52 /* carkeyUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		335DD4392E74426100B0CE75 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -195,6 +223,8 @@
 			);
 			mainGroup = 331325D62E6E869100E86E52;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 331325E02E6E869100E86E52 /* Products */;
 			projectDirPath = "";
@@ -400,6 +430,9 @@
 				DEVELOPMENT_TEAM = QV9R4FN97N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = carkey/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect with your vehicle and function as a digital car key.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +461,9 @@
 				DEVELOPMENT_TEAM = QV9R4FN97N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = carkey/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "This app uses Bluetooth to connect with your vehicle and function as a digital car key.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
