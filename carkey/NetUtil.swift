@@ -6,19 +6,12 @@
 //
 import Foundation
 import CommonCrypto
+import CryptoKit
 
 extension String {
-    var md5: String {
-        let data = Data(self.utf8) // Convert the string to Data using UTF-8 encoding
-        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH)) // Create a buffer for the MD5 digest
-
-        // Perform the MD5 hash calculation
-        data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) in
-            _ = CC_MD5(bytes.baseAddress, CC_LONG(data.count), &digest)
-        }
-
-        // Convert the digest bytes to a hexadecimal string
-        return digest.map { String(format: "%02x", $0) }.joined()
+    func generateMD5() -> String {
+        guard let data = self.data(using: .utf8) else { return "" }
+        return Insecure.MD5.hash(data: data).map { String(format: "%02hhx", $0) }.joined()
     }
 }
 

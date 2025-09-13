@@ -10,13 +10,10 @@ import Foundation
 
 @main
 struct carkeyApp: App {
-    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(DataManager.shared.carData)
-                .environmentObject(DataManager.shared.userData)
-                .environmentObject(DataManager.shared.sgmwUnifiedOAuth)
+            MainTabView()
+                .environmentObject(DataManager.shared)
         }
     }
 }

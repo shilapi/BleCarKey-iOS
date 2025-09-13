@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */; };
+		335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */ = {isa = PBXBuildFile; productRef = 335DD4412E74673100B0CE75 /* SwiftyBluetooth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */,
+				335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,6 +142,7 @@
 			);
 			name = carkey;
 			packageProductDependencies = (
+				335DD4412E74673100B0CE75 /* SwiftyBluetooth */,
 			);
 			productName = carkey;
 			productReference = 331325DF2E6E869100E86E52 /* carkey.app */;
@@ -224,6 +227,7 @@
 			mainGroup = 331325D62E6E869100E86E52;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				335DD4402E74673100B0CE75 /* XCRemoteSwiftPackageReference "SwiftyBluetooth" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 331325E02E6E869100E86E52 /* Products */;
@@ -594,6 +598,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		335DD4402E74673100B0CE75 /* XCRemoteSwiftPackageReference "SwiftyBluetooth" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jordanebelanger/SwiftyBluetooth";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		335DD4412E74673100B0CE75 /* SwiftyBluetooth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 335DD4402E74673100B0CE75 /* XCRemoteSwiftPackageReference "SwiftyBluetooth" */;
+			productName = SwiftyBluetooth;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 331325D72E6E869100E86E52 /* Project object */;
 }

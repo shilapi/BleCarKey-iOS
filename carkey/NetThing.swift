@@ -109,19 +109,14 @@ extension NetworkManager {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("accept", forHTTPHeaderField: "application/json")
         
-        // 添加OAuth
-        DataManager.shared.sgmwUnifiedOAuth.generateAuth()
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.clientid, forHTTPHeaderField: "sgmwclientid")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.accesstoken, forHTTPHeaderField: "sgmwaccesstoken")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.timestamp, forHTTPHeaderField: "sgmwtimestamp")
-        //request.setValue(DataManager.shared.sgmwUnifiedOAuth.platformno, forHTTPHeaderField: "sgmwplatformno")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.appversion, forHTTPHeaderField: "sgmwappversion")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.system, forHTTPHeaderField: "sgmwsystem")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.clientsecret, forHTTPHeaderField: "sgmwclientsecret")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.appcode, forHTTPHeaderField: "sgmwappcode")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.systemversion, forHTTPHeaderField: "sgmwsystemversion")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.signature, forHTTPHeaderField: "sgmwsignature")
-        request.setValue(DataManager.shared.sgmwUnifiedOAuth.nounce, forHTTPHeaderField: "sgmwnonce")
+        if let headers = DataManager.shared.sgmwUnifiedOAuth.generateAuthenticatedHeaders() {
+                for (field, value) in headers {
+                    request.setValue(value, forHTTPHeaderField: field)
+                }
+            } else {
+                // 处理未登录或无法生成签名的情况
+                print("debug: failed to generate SGMW OAuth auth header")
+            }
         
         // Advanced device info
         let device = UIDevice.current
@@ -151,5 +146,47 @@ extension NetworkManager {
         }
         
         self.request(request, completion: completion)
+    }
+}
+
+extension DataManager {
+    func fetchAndLoadCarData() {
+        
+        // 1. 调用你的 NetworkManager 发起请求
+        NetworkManager.shared.requestBaojun(BaojunEndpoint.queryDefaultCarStatus) { [weak self] result in
+            
+            // 确保在主线程处理后续逻辑，因为会更新 @Published 属性
+            DispatchQueue.main.async {
+                
+                switch result {
+                    case .success(let data):
+                        if let responseString = String(data: data, encoding: .utf8) {
+                            self?.loadCarData(from: responseString)
+                        }
+                    case .failure(let error):
+                        print("Error: \(error)")
+                }
+            }
+        }
+    }
+
+    func fetchAndLoadKeyData() {
+        
+        // 1. 调用你的 NetworkManager 发起请求
+        NetworkManager.shared.requestBaojun(BaojunEndpoint.queryBleKey(vin: DataManager.shared.carData?.carInfo.vin ?? "", userId: DataManager.shared.userData?.userID ?? "")) { [weak self] result in
+            
+            // 确保在主线程处理后续逻辑，因为会更新 @Published 属性
+            DispatchQueue.main.async {
+                
+                switch result {
+                    case .success(let data):
+                        if let responseString = String(data: data, encoding: .utf8) {
+                            self?.loadKeyData(from: responseString)
+                        }
+                    case .failure(let error):
+                        print("Error: \(error)")
+                }
+            }
+        }
     }
 }
