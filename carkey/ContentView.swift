@@ -24,12 +24,14 @@ struct ApiStatusView: View {
     let lastUpdateTime: String?
 
     var body: some View {
-        HStack {
-            Spacer()
-            Text(statusText)
-                .font(.footnote) // 使用小号字体
-                .foregroundColor(.secondary) // 使用非常柔和的灰色
-            Spacer()
+        Section(){
+            HStack {
+                Spacer()
+                Text(statusText)
+                    .font(.footnote) // 使用小号字体
+                    .foregroundColor(.secondary) // 使用非常柔和的灰色
+                Spacer()
+            }
         }
     }
     
@@ -107,12 +109,12 @@ struct CarInfoView: View {
                     } else {
                         Text("无车辆信息")
                     }
-                    
-                    ApiStatusView(error: nil, lastUpdateTime: dataManager.carData?.carStatus.collectTime)
-                    .listRowSeparator(.hidden)
-                    .padding(.vertical)
-                    .listRowBackground(Color.clear)
                 }
+                ApiStatusView(error: nil, lastUpdateTime: dataManager.carData?.carStatus.collectTime)
+                .listRowSeparator(.hidden)
+                .padding(.vertical)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: -10, leading: 0, bottom: 20, trailing: 0))
                 
                 
                 
@@ -231,35 +233,50 @@ struct UserInfoView: View {
 // --- Debug Tab (仅在 DEBUG 模式下编译) ---
 #if DEBUG
 struct DebugView: View {
+    @ObservedObject private var bt = BluetoothManager.shared
+    
     var body: some View {
-        VStack(spacing: 30) {
-            Text("调试专用")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            Text("此页面仅在 SwiftUI 预览中可见，不会打包进最终 App。")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding()
-            
-            Button(action: {
-                DataManager.shared.injectMockData()
-            }) {
-                Text("注入所有模拟数据")
-                    .frame(maxWidth: .infinity)
+        NavigationView {
+            List {
+                Section("数据注入") {
+                    Button(action: {
+                        DataManager.shared.injectMockData()
+                    }) {
+                        Text("注入所有模拟数据")
+                            //.frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    //.buttonStyle(.borderless)
+                    
+                    Button(action: {
+                        DataManager.shared.clearAllData()
+                    }) {
+                        Text("清除所有数据")
+                            //.frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    //.buttonStyle(.borderless)
+                }
+                
+                Section(header: Text("蓝牙")) {
+                    Text("当前状态： \(bt.state)")
+                    
+                    Section(header: Text("发现的设备 (\(bt.avaliblePeripherals.count))")) {
+                        if bt.avaliblePeripherals.isEmpty {
+                            Text( "请开始扫描来发现附近的设备...")
+                                .foregroundColor(.gray)
+                                .padding()
+                        } else {
+                            ForEach(bt.avaliblePeripherals) {device in
+                                Text(device.id)
+                            }
+                        }
+                    }
+                    
+                    Button("开始扫描", action: {
+                        BluetoothManager.shared.StartScan()
+                    })
+                }
             }
-            .buttonStyle(.borderedProminent)
-            
-            Button(action: {
-                DataManager.shared.clearAllData()
-            }) {
-                Text("清除所有数据")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            
-            .padding()
+            .navigationTitle("DEBUG")
         }
     }
 }
@@ -292,12 +309,12 @@ struct MainTabView: View {
             
             // 仅在 DEBUG 模式下编译，且仅在预览时显示
             #if DEBUG
-            if isRunningForPreviews {
-                DebugView()
-                    .tabItem {
-                        Label("调试", systemImage: "ladybug.fill")
-                    }
-            }
+        
+            DebugView()
+                .tabItem {
+                    Label("调试", systemImage: "ladybug.fill")
+                }
+        
             #endif
         }
     }
@@ -310,4 +327,5 @@ struct MainTabView: View {
     // 这里可以直接使用单例
     MainTabView()
         .environmentObject(DataManager.shared)
+        .environmentObject(BluetoothManager.shared)
 }
