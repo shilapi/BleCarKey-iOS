@@ -9,31 +9,47 @@ import SwiftUI
 import CoreBluetooth
 
 enum SGMWBLEProfile {
-    enum Services {
-        static let UnknownSpectialService = CBUUID(string: "F000FFD0-0451-4000-B000-000000000000")
-        static let AuthorizeService = CBUUID(string: "181A")
-        static let ControlService = CBUUID(string: "182A")
-        
-        static let AllServices = [
-            UnknownSpectialService,
-            AuthorizeService,
-            ControlService
-        ]
-    }
-
-    enum AuthorizeCharacteristics {
-        // request by Write
-        static let Request = CBUUID(string: "2A6E")
-        // response by notify
-        static let Response = CBUUID(string: "2A6F")
+    enum UnknownSpectial {
+        static let uuid = CBUUID(string: "F000FFD0-0451-4000-B000-000000000000")
     }
     
-    enum ControlServiceCharacteristics {
-        // request by Write
-        static let Request = CBUUID(string: "2A7E")
-        // response by notify
-        static let Response = CBUUID(string: "2A7F")
+    enum AuthorizeService {
+        static let uuid = CBUUID(string: "181A")
+        
+        enum Characteristics {
+            // request by Write
+            static let Request = CBUUID(string: "2A6E")
+            // response by notify
+            static let Response = CBUUID(string: "2A6F")
+            
+            static let AllCharacteristicsUuid = [
+                Request,
+                Response
+            ]
+        }
     }
+    
+    enum ControlService {
+        static let uuid = CBUUID(string: "182A")
+        
+        enum Characteristics {
+            // request by Write
+            static let Request = CBUUID(string: "2A7E")
+            // response by notify
+            static let Response = CBUUID(string: "2A7F")
+            
+            static let AllCharacteristicsUuid = [
+                Request,
+                Response
+            ]
+        }
+    }
+    
+    static let AllServicesUuid = [
+        UnknownSpectial.uuid,
+        AuthorizeService.uuid,
+        ControlService.uuid
+    ]
 }
 
 

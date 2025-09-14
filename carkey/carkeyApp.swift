@@ -14,6 +14,7 @@ struct carkeyApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(DataManager.shared)
+                .environmentObject(BluetoothManager.shared)
         }
     }
 }

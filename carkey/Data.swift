@@ -40,7 +40,9 @@ struct CarKeyData: Decodable {
     }
 
     var bleMacString: String {
-        return bleMac.replacingOccurrences(of: ":", with: "")
+        return bleMac
+            .replacingOccurrences(of: ":", with: "")
+            .uppercased()
     }
 }
 
@@ -91,13 +93,13 @@ struct CarInfo: Decodable {
     let carName, carPlate, vsn, providerCode: String
     let carTypeName, model, level: String
     let engineType: Int
-    let image: String // 如果确定是URL，也可以用 URL? 类型
+    let image: String
     let controlView, bleType, hasMoreCar: Int
     let folderUrl: String
     let shakeLock, physicsEngine, supportMqtt, supportCarConditionPoll: Int
     let conditionPollTime, isAuthIdentity: Int
     let bluetoothKeyConnectMark: String
-    let imageNameRule: [String] // 假设是字符串数组
+    let imageNameRule: [String]
     let telematicsPlatform: Int
     let showWidgets: Bool
     let telematicsCarStatus, carPosition: Int
