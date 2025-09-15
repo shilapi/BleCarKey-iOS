@@ -84,7 +84,6 @@ extension BluetoothManager: ObservableObject {
         }
     }
 	
-	// 如果你把这里展开，你会看到一堆屎山，但是我tm不想分函数了
 	private func onScanMatchCallback(peripheral: Peripheral) {
 		// 没有设备名/没获取车数据return
 		guard let name = peripheral.name,
@@ -94,98 +93,111 @@ extension BluetoothManager: ObservableObject {
 		if name.contains(DataManager.shared.carKeyData?.bleMacString ?? "000000000000") != true {
 			return
 		}
+		print("BtThing: ble name matched: \(name)")
 		
 		var target = BleTarget(peripheral: peripheral)
 		
 		target.peripheral.connect(withTimeout: 5){ result in
 			switch result {
 			case .success:
-				print("BThing: ble connected")
-				
-				// 看一下设备的服务&特征，没有就连错了，断联
-				target.peripheral.discoverServices(withUUIDs: SGMWBLEProfile.AllServicesUuid) { result in
-					switch result {
-					case .success(let services):
-						print("BtThing: discovered services: \(services.map { $0.uuid.uuidString })")
-						for service in services {
-							
-							// 是鉴权服务
-							if service.uuid == SGMWBLEProfile.AuthorizeService.uuid {
-								target.authorizeService = service
-								target.peripheral.discoverCharacteristics(
-									withUUIDs: SGMWBLEProfile.AuthorizeService.Characteristics.AllCharacteristicsUuid,
-									ofServiceWithUUID: service.uuid
-								) { result in
-									switch result {
-									case .success(let characteristics):
-										for characteristic in characteristics {
-											switch characteristic.uuid {
-											case SGMWBLEProfile.AuthorizeService.Characteristics.Request:
-												target.authorizeRequestCharacteristic = characteristic
-											case SGMWBLEProfile.AuthorizeService.Characteristics.Response:
-												target.authorizeResponseCharacteristic = characteristic
-											default:
-												print("BtThing: found unknown characteristic under authorize service with uuid: \(characteristic.uuid)")
-											}
-										}
-									case .failure(let error):
-										print("BtThing: unable to find target characteristics under authorize service, disconnecting: \(error)")
-										self.disconnectPeripheral(peripheral: target.peripheral)
-									}
-								}
-								
-								// 是控制服务
-							} else if service.uuid == SGMWBLEProfile.ControlService.uuid {
-								target.controlService = service
-								target.peripheral.discoverCharacteristics(
-									withUUIDs: SGMWBLEProfile.ControlService.Characteristics.AllCharacteristicsUuid,
-									ofServiceWithUUID: service.uuid
-								) { result in
-									switch result {
-									case .success(let characteristics):
-										for characteristic in characteristics {
-											switch characteristic.uuid {
-											case SGMWBLEProfile.ControlService.Characteristics.Request:
-												target.controlRequestCharacteristic = characteristic
-											case SGMWBLEProfile.ControlService.Characteristics.Response:
-												target.controlResponseCharacteristic = characteristic
-											default:
-												print("BtThing: found unknown characteristic under control service with uuid: \(characteristic.uuid)")
-											}
-										}
-									case .failure(let error):
-										print("BtThing: unable to find target characteristics under control service, disconnecting: \(error)")
-										self.disconnectPeripheral(peripheral: target.peripheral)
-									}
-								}
-							}
-						}
-					case .failure(let error):
-						print("BtThing: unable to find target services, disconnecting: \(error)")
-						self.disconnectPeripheral(peripheral: target.peripheral)
-					}
-				}
-				// 确定一下设备服务特征全了
-				guard target.controlService != nil,
-					  target.authorizeService != nil,
-					  target.controlRequestCharacteristic != nil,
-					  target.controlResponseCharacteristic != nil,
-					  target.authorizeRequestCharacteristic != nil,
-					  target.authorizeResponseCharacteristic != nil else {
-					// 这里一定不能忘记断连
-					self.disconnectPeripheral(peripheral: target.peripheral)
-					return
-				}
-				
-				// 回传target，注册auth的notification
-				self.target = target
-				// TODO: 注册notification
-					  
-				
+				print("BtThing: ble connected to \(name)")
+				self.checkIfHaveTargetService(bleTarget: target)
 			case .failure(let error):
 				print("BtThing: failed to connect: \(error)")
+				return
 			}
 		}
+	}
+	
+	private func checkIfHaveTargetService(bleTarget: BleTarget){
+		// 看一下设备的服务&特征，没有就连错了，断联
+		// 如果你把这里展开，你会看到一堆屎山，但是我tm不想分函数了
+		var target = bleTarget
+		target.peripheral.discoverServices(withUUIDs: SGMWBLEProfile.AllServicesUuid) { result in
+			switch result {
+			case .success(let services):
+				print("BtThing: discovered services: \(services.map { $0.uuid.uuidString })")
+				for service in services {
+					
+					// 是鉴权服务
+					if service.uuid == SGMWBLEProfile.AuthorizeService.uuid {
+						target.authorizeService = service
+						target.peripheral.discoverCharacteristics(
+							withUUIDs: SGMWBLEProfile.AuthorizeService.Characteristics.AllCharacteristicsUuid,
+							ofServiceWithUUID: service.uuid
+						) { result in
+							switch result {
+							case .success(let characteristics):
+								print("BtThing: discovered characteristics: \(characteristics.map { $0.uuid.uuidString })")
+								for characteristic in characteristics {
+									switch characteristic.uuid {
+									case SGMWBLEProfile.AuthorizeService.Characteristics.Request:
+										target.authorizeRequestCharacteristic = characteristic
+									case SGMWBLEProfile.AuthorizeService.Characteristics.Response:
+										target.authorizeResponseCharacteristic = characteristic
+									default:
+										print("BtThing: found unknown characteristic under authorize service with uuid: \(characteristic.uuid)")
+									}
+									self.ensureTargetFulfill(target: target)
+								}
+							case .failure(let error):
+								print("BtThing: unable to find target characteristics under authorize service, disconnecting: \(error)")
+								self.disconnectPeripheral(peripheral: target.peripheral)
+							}
+						}
+						
+						// 是控制服务
+					} else if service.uuid == SGMWBLEProfile.ControlService.uuid {
+						target.controlService = service
+						target.peripheral.discoverCharacteristics(
+							withUUIDs: SGMWBLEProfile.ControlService.Characteristics.AllCharacteristicsUuid,
+							ofServiceWithUUID: service.uuid
+						) { result in
+							switch result {
+							case .success(let characteristics):
+								print("BtThing: discovered characteristics: \(characteristics.map { $0.uuid.uuidString })")
+								for characteristic in characteristics {
+									switch characteristic.uuid {
+									case SGMWBLEProfile.ControlService.Characteristics.Request:
+										target.controlRequestCharacteristic = characteristic
+									case SGMWBLEProfile.ControlService.Characteristics.Response:
+										target.controlResponseCharacteristic = characteristic
+									default:
+										print("BtThing: found unknown characteristic under control service with uuid: \(characteristic.uuid)")
+									}
+								}
+								self.ensureTargetFulfill(target: target)
+							case .failure(let error):
+								print("BtThing: unable to find target characteristics under control service, disconnecting: \(error)")
+								self.disconnectPeripheral(peripheral: target.peripheral)
+							}
+						}
+					}
+				}
+			case .failure(let error):
+				print("BtThing: unable to find target services, disconnecting: \(error)")
+				self.disconnectPeripheral(peripheral: target.peripheral)
+			}
+		}
+
+	}
+	
+	private func ensureTargetFulfill(target: BleTarget){
+		// 确定一下设备服务特征全了
+		guard target.controlService != nil,
+			  target.authorizeService != nil,
+			  target.controlRequestCharacteristic != nil,
+			  target.controlResponseCharacteristic != nil,
+			  target.authorizeRequestCharacteristic != nil,
+			  target.authorizeResponseCharacteristic != nil else {
+			return
+		}
+		
+		print("BtThing: discoverd all services and characteristic")
+		
+		// 回传target，注册auth的notification
+		self.target = target
+		// TODO: 注册notification
 	}
 	
     private func authorize(peripheral: Peripheral) {
@@ -203,7 +215,7 @@ extension BluetoothManager: ObservableObject {
             case .success:
                 self.target = nil
                 self.state = .disconnected
-                print("BtThing: disconnected")
+				print("BtThing: disconnected to \(peripheral.name ?? "NONAME")")
             case .failure(let error):
                 print("BtThing: failed to disconnect: \(error)")
             }
