@@ -272,7 +272,7 @@ struct DebugView: View {
                     }
                     
                     Button("开始扫描", action: {
-                        BluetoothManager.shared.StartScan()
+						BluetoothManager.shared.startScan()
                     })
                 }
             }

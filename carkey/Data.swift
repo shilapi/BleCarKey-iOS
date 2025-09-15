@@ -166,10 +166,16 @@ extension DataManager {
                 print("loadKeyData: failed to load BLE key: server returned false")
                 return
             }
-            DispatchQueue.main.async {
-                self.carKeyData = apiResponse.data
-                print("loadKeyData: BLE key data loaded for VIN: \(apiResponse.data.vin)")
-            }
+
+			self.carKeyData = apiResponse.data
+			var keyInfo = E300BleKeyInfoModel()
+			keyInfo.aes128Key = self.carKeyData!.masterKey.data(using: .utf8)
+			keyInfo.bleMacStr = self.carKeyData!.bleMacString
+			if let intValue = Int(self.carKeyData!.keyId) {
+				keyInfo.keyIdHex = String(intValue, radix: 16)}
+			BluetoothManager.shared.keyInfo = keyInfo
+			print("loadKeyData: BLE key data loaded for VIN: \(apiResponse.data.vin)")
+            
         } catch {
             print("loadKeyData: failed to load BLE key: \(error)")
         }
