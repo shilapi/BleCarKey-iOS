@@ -171,7 +171,8 @@ extension BluetoothManager {
 				
 				// Step 3: If characteristics are found, proceed to enable notifications
 				if self.target?.authorizeResponseCharacteristic != nil {
-					self.setAuthorizeNotification()
+					self.setAllNotification()
+					
 				} else {
 					print("BtThing: did not find all required authorization characteristics, disconnecting")
 					self.disconnectPeripheral(peripheral: peripheral)
@@ -183,10 +184,13 @@ extension BluetoothManager {
 		}
 	}
 	
-	private func setAuthorizeNotification() {
-		guard let target = self.target, let responseChar = target.authorizeResponseCharacteristic else { return }
+	private func setAllNotification() {
+		guard let target = self.target,
+			  let authResponseChar = target.authorizeResponseCharacteristic,
+			  let controlResponseChar = target.controlResponseCharacteristic
+		else { return }
 		
-		print("BtThing: enabling notifications for authorization...")
+		print("BtThing: enabling notifications for authorization and control...")
 		
 		// Register observer BEFORE enabling notifications
 		NotificationCenter.default.addObserver(self,
@@ -194,26 +198,21 @@ extension BluetoothManager {
 											   name: Peripheral.PeripheralCharacteristicValueUpdate,
 											   object: target.peripheral)
 		
-		target.peripheral.setNotifyValue(toEnabled: true, ofCharac: responseChar) { [weak self] result in
+		// Set notify value for auth
+		target.peripheral.setNotifyValue(toEnabled: true, ofCharac: authResponseChar) { [weak self] result in
 			guard let self = self else { return }
 			switch result {
 			case .success(let isNotifying) where isNotifying:
-				target.peripheral.setNotifyValue(toEnabled: true, ofCharac: responseChar) { [weak self] result in
+				target.peripheral.setNotifyValue(toEnabled: true, ofCharac: authResponseChar) { [weak self] result in
 					guard let self = self else { return }
 					switch result {
 					case .success(let isNotifying) where isNotifying:
 						print("BtThing: successfully set notify for authorize")
-						
 						// Start a 7-second timer to wait for the car's challenge
-						
 						self.authenticationMonitoringTask?.invalidate()
-						
 						self.authenticationMonitoringTask = Timer.scheduledTimer(withTimeInterval: 7.0, repeats: false) { _ in
-							
 							print("BtThing: Authorization timed out after 7 seconds.")
-							
 							self.disconnectPeripheral(peripheral: target.peripheral)
-							
 						}
 					case .failure(let error):
 						print("BtThing: failed to set notify for authorize: \(error)")
@@ -224,6 +223,31 @@ extension BluetoothManager {
 				}
 			case .failure(let error):
 				print("BtThing: failed to set notify for authorize: \(error)")
+				self.disconnectPeripheral(peripheral: target.peripheral)
+			default:
+				break
+			}
+		}
+		
+		// Set notify value for control
+		target.peripheral.setNotifyValue(toEnabled: true, ofCharac: controlResponseChar) { [weak self] result in
+			guard let self = self else { return }
+			switch result {
+			case .success(let isNotifying) where isNotifying:
+				target.peripheral.setNotifyValue(toEnabled: true, ofCharac: controlResponseChar) { [weak self] result in
+					guard let self = self else { return }
+					switch result {
+					case .success(let isNotifying) where isNotifying:
+						print("BtThing: successfully set notify for control")
+					case .failure(let error):
+						print("BtThing: failed to set notify for control: \(error)")
+						self.disconnectPeripheral(peripheral: target.peripheral)
+					default:
+						break
+					}
+				}
+			case .failure(let error):
+				print("BtThing: failed to set notify for control: \(error)")
 				self.disconnectPeripheral(peripheral: target.peripheral)
 			default:
 				break
