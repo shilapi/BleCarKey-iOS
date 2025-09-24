@@ -8,7 +8,8 @@ import Foundation
 import SwiftUI
 import Combine
 
-struct UserData {
+// MARK: - 数据结构
+struct UserData: Codable {
     var userName: String
     var accessToken: String
     var clientSecret: String
@@ -22,7 +23,7 @@ struct CarKeyAPIResponse: Decodable {
     let systemTimeMillis: Int
 }
 
-struct CarKeyData: Decodable {
+struct CarKeyData: Codable {
     var collectTime: String
     var keyId: String
     var keyType: String
@@ -46,19 +47,19 @@ struct CarKeyData: Decodable {
     }
 }
 
-struct VehicleAPIResponse: Decodable {
+struct VehicleAPIResponse: Codable {
     let result: Bool
     let data: CarData
     let systemDate: String
     let systemTimeMillis: Int
 }
 
-struct CarData: Decodable {
+struct CarData: Codable {
     let carStatus: CarStatus
     let carInfo: CarInfo
 }
 
-struct CarStatus: Decodable {
+struct CarStatus: Codable {
     let status, statusToast, statusName, leftTurnLight: String
     let positionLight, rightTurnLight, dipHeadLight, lowBeamLight: String
     let leftFuel, keyStatus, autoGearStatus, window4Status: String
@@ -87,7 +88,7 @@ struct CarStatus: Decodable {
     var interiorTemp: Double? { Double(interiorTemperature) }
 }
 
-struct CarInfo: Decodable {
+struct CarInfo: Codable {
     let vin: String
     let relation: Int
     let carName, carPlate, vsn, providerCode: String
@@ -123,26 +124,66 @@ struct CarInfo: Decodable {
     }
 }
 
+// MARK: - ????屎山
+struct AppData: Codable {
+	var userData: UserData?
+	var carKeyData: CarKeyData?
+	var carData: CarData?
+}
 
 class DataManager: ObservableObject {
     
     static let shared = DataManager()
     
-    @Published var userData: UserData?
-    @Published var carKeyData: CarKeyData?
-    @Published var carData: CarData?
+	@Published var appData: AppData {
+		didSet {
+			save()
+		}
+	}
     
     let sgmwUnifiedOAuth = SGMWUnifiedOAuth()
     
-    private init() {}
+	private static func archiveURL() -> URL {
+		let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+		return documentsDirectory.appendingPathComponent("UserData").appendingPathExtension("json")
+	}
+	
+    private init() {
+		guard let data = try? Data(contentsOf: DataManager.archiveURL()) else {
+			self.appData = AppData()
+			print("DataManager: failed to load local user data: not exist")
+			return
+		}
+		do {
+			let decoder = JSONDecoder()
+			self.appData = try decoder.decode(AppData.self, from: data)
+		} catch {
+			print("DataManager：failed to decode AppData: \(error.localizedDescription)")
+			self.appData = AppData()
+			return
+		}
+		print("DataManager: load local user data successfully")
+	}
 }
 
 extension DataManager {
 
+	func save() {
+		do {
+			let encoder = JSONEncoder()
+			encoder.outputFormatting = .prettyPrinted
+			let data = try encoder.encode(appData)
+			try data.write(to: DataManager.archiveURL())
+			print("DataManager: save local user data successfully")
+		} catch {
+			print("DataManager: failed to save local user data: \(error.localizedDescription)")
+		}
+	}
+	
     func login(userName: String, accessToken: String, clientSecret: String, userID: String) {
         let newUser = UserData(userName: userName, accessToken: accessToken, clientSecret: clientSecret, userID: userID)
         DispatchQueue.main.async {
-            self.userData = newUser
+			self.appData.userData = newUser
             print("debug: logged in as \(newUser.userID)")
         }
         sgmwUnifiedOAuth.updateToken(accessToken: newUser.accessToken, clientSecret: newUser.clientSecret)
@@ -150,9 +191,9 @@ extension DataManager {
 
     func logout() {
         DispatchQueue.main.async {
-            self.userData = nil
-            self.carKeyData = nil
-            self.carData = nil
+			self.appData.userData = nil
+			self.appData.carKeyData = nil
+			self.appData.carData = nil
             print("debug: logged out")
         }
     }
@@ -167,11 +208,11 @@ extension DataManager {
                 return
             }
 
-			self.carKeyData = apiResponse.data
+			self.appData.carKeyData = apiResponse.data
 			var keyInfo = E300BleKeyInfoModel()
-			keyInfo.aes128Key = self.carKeyData!.masterKey.data(using: .utf8)
-			keyInfo.bleMacStr = self.carKeyData!.bleMacString
-			if let intValue = Int(self.carKeyData!.keyId) {
+			keyInfo.aes128Key = self.appData.carKeyData!.masterKey.data(using: .utf8)
+			keyInfo.bleMacStr = self.appData.carKeyData!.bleMacString
+			if let intValue = Int(self.appData.carKeyData!.keyId) {
 				keyInfo.keyIdHex = String(intValue, radix: 16)}
 			BluetoothManager.shared.keyInfo = keyInfo
 			print("loadKeyData: BLE key data loaded for VIN: \(apiResponse.data.vin)")
@@ -195,7 +236,7 @@ extension DataManager {
                 return
             }
             DispatchQueue.main.async {
-                self.carData = apiResponse.data
+				self.appData.carData = apiResponse.data
                 print("loadCarData: successed for \(apiResponse.data.carInfo.carTypeName)")
             }
         } catch {
@@ -226,7 +267,7 @@ struct CompleteDemoView: View {
             List {
                 // 用户信息区
                 Section(header: Text("用户信息")) {
-                    if let user = dataManager.userData {
+					if let user = dataManager.appData.userData {
                         Text("用户名: \(user.userName)")
                         Text("用户ID: \(user.userID)")
                         Button("登出", role: .destructive) { dataManager.logout() }
@@ -239,7 +280,7 @@ struct CompleteDemoView: View {
                 
                 // 车辆信息区
                 Section(header: Text("车辆信息")) {
-                    if let carInfo = dataManager.carData?.carInfo {
+					if let carInfo = dataManager.appData.carData?.carInfo {
                         Text("车型: \(carInfo.carTypeName)")
                         Text("车名: \(carInfo.carName)")
                         Text("颜色: \(carInfo.colorName)")
@@ -250,7 +291,7 @@ struct CompleteDemoView: View {
                 
                 // 车辆状态区
                 Section(header: Text("车辆状态")) {
-                    if let carStatus = dataManager.carData?.carStatus {
+					if let carStatus = dataManager.appData.carData?.carStatus {
                         Text("状态: \(carStatus.statusName)")
                         Text("续航: \(carStatus.remainingMileage ?? 0) km")
                         Text("电量: \(carStatus.batterySOCPercentage ?? 0)%")
@@ -261,7 +302,7 @@ struct CompleteDemoView: View {
                 
                 // 蓝牙密钥区
                 Section(header: Text("蓝牙密钥")) {
-                    if let keyData = dataManager.carKeyData {
+					if let keyData = dataManager.appData.carKeyData {
                         Text("密钥类型: \(keyData.keyType)")
                         Text("MAC地址: \(keyData.bleMacString)")
                     } else {

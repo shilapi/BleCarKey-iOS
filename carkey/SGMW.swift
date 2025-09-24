@@ -98,7 +98,7 @@ class SGMWUnifiedOAuth {
     public func generateAuthenticatedHeaders() -> [String: String]? {
         
         // 1. 调用内部方法生成动态参数 (签名, nonce, 时间戳)
-        guard let authParams = generateAuthenticationParameters(appid: "1145141919810", phone: DataManager.shared.userData?.userID ?? "18000000001"),
+		guard let authParams = generateAuthenticationParameters(appid: "1145141919810", phone: DataManager.shared.appData.userData?.userID ?? "18000000001"),
               let currentAccessToken = self.accessToken,
               let currentClientSecret = self.clientSecret else {
             print("debug: failed to generate headers")

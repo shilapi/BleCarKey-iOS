@@ -59,18 +59,18 @@ extension DataManager {
     func injectMockData() {
         print(" MOCK: 正在注入模拟数据...")
         DispatchQueue.main.async {
-            self.userData = UserData.mock
-            self.carKeyData = CarKeyData.mock
-            self.carData = CarData.mock
+			self.appData.userData = UserData.mock
+			self.appData.carKeyData = CarKeyData.mock
+			self.appData.carData = CarData.mock
         }
     }
     
     /// 清除所有数据，方便测试
     func clearAllData() {
         DispatchQueue.main.async {
-            self.userData = nil
-            self.carKeyData = nil
-            self.carData = nil
+			self.appData.userData = nil
+			self.appData.carKeyData = nil
+			self.appData.carData = nil
         }
     }
 }

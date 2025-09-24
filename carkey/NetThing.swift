@@ -173,7 +173,7 @@ extension DataManager {
     func fetchAndLoadKeyData() {
         
         // 1. 调用你的 NetworkManager 发起请求
-        NetworkManager.shared.requestBaojun(BaojunEndpoint.queryBleKey(vin: DataManager.shared.carData?.carInfo.vin ?? "", userId: DataManager.shared.userData?.userID ?? "")) { [weak self] result in
+		NetworkManager.shared.requestBaojun(BaojunEndpoint.queryBleKey(vin: DataManager.shared.appData.carData?.carInfo.vin ?? "", userId: DataManager.shared.appData.userData?.userID ?? "")) { [weak self] result in
             
             // 确保在主线程处理后续逻辑，因为会更新 @Published 属性
             DispatchQueue.main.async {

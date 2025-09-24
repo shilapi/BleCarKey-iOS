@@ -52,7 +52,7 @@ struct CarInfoView: View {
     var body: some View {
         NavigationView {
             List {
-                if dataManager.carData != nil {
+				if dataManager.appData.carData != nil {
                     // 1. 使用 ZStack 作为根容器来实现层叠效果
                     ZStack(alignment: .topLeading) { // 默认对齐方式设为左上
                         
@@ -85,7 +85,7 @@ struct CarInfoView: View {
                 }
                 
                 Section(header: Text("核心状态")) {
-                    if let status = dataManager.carData?.carStatus {
+					if let status = dataManager.appData.carData?.carStatus {
                         InfoRowView(label: "车辆状态", value: status.statusName)
                         InfoRowView(label: "剩余续航", value: "\(status.remainingMileage ?? 0) KM")
                         InfoRowView(label: "电池电量", value: "\(status.batterySOCPercentage ?? 0)%")
@@ -97,7 +97,7 @@ struct CarInfoView: View {
                 }
                 
                 Section(header: Text("车辆信息")) {
-                    if let info = dataManager.carData?.carInfo {
+					if let info = dataManager.appData.carData?.carInfo {
                         InfoRowView(label: "车型", value: info.carTypeName)
                         InfoRowView(label: "车名", value: info.carName)
                         InfoRowView(label: "颜色", value: info.colorName)
@@ -110,13 +110,12 @@ struct CarInfoView: View {
                         Text("无车辆信息")
                     }
                 }
-                ApiStatusView(error: nil, lastUpdateTime: dataManager.carData?.carStatus.collectTime)
+				
+				ApiStatusView(error: nil, lastUpdateTime: dataManager.appData.carData?.carStatus.collectTime)
                 .listRowSeparator(.hidden)
                 .padding(.vertical)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: -10, leading: 0, bottom: 20, trailing: 0))
-                
-                
                 
             }
             // .navigationTitle("车辆信息")
@@ -138,7 +137,7 @@ struct CarKeyInfoView: View {
     var body: some View {
         List {
             Section(header: Text("蓝牙密钥详情")) {
-                if let keyData = dataManager.carKeyData {
+				if let keyData = dataManager.appData.carKeyData {
                     InfoRowView(label: "密钥ID", value: keyData.keyId.masked(percentage: 0.7))
                     InfoRowView(label: "密钥类型", value: keyData.keyType)
                     InfoRowView(label: "VIN码", value: keyData.vin.masked(percentage: 0.7))
@@ -209,7 +208,7 @@ struct UserInfoView: View {
         NavigationView {
             List {
                 Section(header: Text("账户信息")) {
-                    if let user = dataManager.userData {
+					if let user = dataManager.appData.userData {
                         InfoRowView(label: "用户名", value: user.userName)
                         InfoRowView(label: "用户ID (手机)", value: user.userID.masked(percentage: 0.7))
                         InfoRowView(label: "Access Token", value: String(user.accessToken.prefix(10) + "...").masked(percentage: 0.7))

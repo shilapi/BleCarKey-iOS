@@ -62,9 +62,9 @@ class BluetoothManager: ObservableObject {
 	private init(){
 		// Mock key info loading
 		self.keyInfo = E300BleKeyInfoModel(
-			bleMacStr: "609866F07BEB", // IMPORTANT: Use the correct MAC from your vehicle
-			keyIdHex: "01020304",
-			aes128Key: "0123456789ABCDEF0123456789ABCDEF".dataFromHexString()!
+			bleMacStr: DataManager.shared.appData.carKeyData?.bleMacString ?? "609866F07BEB",
+			keyIdHex: String(format: "%X", Int(DataManager.shared.appData.carKeyData?.keyId ?? "00000000") ?? "00000000").addZero(toLength: 8),
+			aes128Key: DataManager.shared.appData.carKeyData?.masterKey.dataFromHexString() ?? "8ED0DB094F0343BF61D86763F1216000".dataFromHexString()
 		)
 	}
 }
@@ -98,7 +98,6 @@ extension BluetoothManager {
 		}
 	}
 	
-	// MARK: - MODIFICATION POINT: Using Manufacturer Data for matching
 	private func onScanMatchCallback(peripheral: Peripheral, advertisementData: [String: Any]) {
 		guard !isFound,
 			  let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
@@ -127,8 +126,7 @@ extension BluetoothManager {
 													   name: Peripheral.PeripheralDisconnected,
 													   object: peripheral)
 				
-				// Start the strict, sequential discovery process
-				self.startSequentialDiscovery(for: peripheral)
+				self.startServiceDiscovery(for: peripheral)
 				
 			case .failure(let error):
 				print("BtThing: failed to connect: \(error)")
@@ -137,23 +135,26 @@ extension BluetoothManager {
 		}
 	}
 	
-	// MARK: - MODIFICATION POINT: Replaced concurrent discovery with a sequential flow
-	private func startSequentialDiscovery(for peripheral: Peripheral) {
+	private func startServiceDiscovery(for peripheral: Peripheral) {
 		print("BtThing: starting sequential discovery flow...")
 		self.state = .authorizing
 		
-		// Step 1: Discover Authorization Service ONLY
-		peripheral.discoverServices(withUUIDs: [SGMWBLEProfile.AuthorizeService.uuid]) { [weak self] result in
+		peripheral.discoverServices(withUUIDs: nil) { [weak self] result in
 			guard let self = self else { return }
 			switch result {
 			case .success(let services):
-				guard let authService = services.first else {
-					print("BtThing: unable to find target authorization service, disconnecting")
-					self.disconnectPeripheral(peripheral: peripheral)
-					return
+				for service in services {
+					switch service.uuid {
+					case SGMWBLEProfile.AuthorizeService.uuid:
+						print("BtThing: discovered authorize service")
+						self.discoverAuthorizationCharacteristics(for: peripheral, service: service)
+					case SGMWBLEProfile.ControlService.uuid:
+						print("BtThing: discovered control service")
+						self.discoverControlCharacteristics(for: peripheral, service: service)
+					default:
+						print("BtThing: discovered unknown service: \(service.uuid); with description: \(service.description)")
+					}
 				}
-				// Step 2: Discover Authorization Characteristics ONLY
-				self.discoverAuthorizationCharacteristics(for: peripheral, service: authService)
 			case .failure(let error):
 				print("BtThing: unable to find target services, disconnecting: \(error)")
 				self.disconnectPeripheral(peripheral: peripheral)
@@ -162,26 +163,58 @@ extension BluetoothManager {
 	}
 	
 	private func discoverAuthorizationCharacteristics(for peripheral: Peripheral, service: CBService) {
-		peripheral.discoverCharacteristics(withUUIDs: SGMWBLEProfile.AuthorizeService.Characteristics.AllCharacteristicsUuid, ofServiceWithUUID: service.uuid) { [weak self] result in
+		peripheral.discoverCharacteristics(withUUIDs: nil, ofServiceWithUUID: service.uuid) { [weak self] result in
 			guard let self = self else { return }
 			switch result {
 			case .success(let characteristics):
 				print("BtThing: discovered authorization characteristics")
 				self.assignCharacteristics(characteristics)
-				
-				// Step 3: If characteristics are found, proceed to enable notifications
-				if self.target?.authorizeResponseCharacteristic != nil {
-					self.setAllNotification()
-					
-				} else {
-					print("BtThing: did not find all required authorization characteristics, disconnecting")
-					self.disconnectPeripheral(peripheral: peripheral)
-				}
 			case .failure(let error):
 				print("BtThing: unable to find target characteristics under authorize service, disconnecting: \(error)")
 				self.disconnectPeripheral(peripheral: peripheral)
 			}
 		}
+	}
+	
+	private func discoverControlCharacteristics(for peripheral: Peripheral, service: CBService) {
+		peripheral.discoverCharacteristics(withUUIDs: nil, ofServiceWithUUID: service.uuid) { [weak self] result in
+			guard let self = self else { return }
+			switch result {
+			case .success(let characteristics):
+				print("BtThing: discovered control characteristics")
+				self.assignCharacteristics(characteristics)
+			case .failure(let error):
+				print("BtThing: unable to find target characteristics under control service, disconnecting: \(error)")
+				self.disconnectPeripheral(peripheral: peripheral)
+			}
+		}
+	}
+	
+	private func assignCharacteristics(_ characteristics: [CBCharacteristic]) {
+		for characteristic in characteristics {
+			switch characteristic.uuid {
+			case SGMWBLEProfile.AuthorizeService.Characteristics.Request.CBUUIDRepresentation:
+				self.target?.authorizeRequestCharacteristic = characteristic
+				print("BtThing: got authorizeRequestCharacteristic")
+			case SGMWBLEProfile.AuthorizeService.Characteristics.Response.CBUUIDRepresentation:
+				self.target?.authorizeResponseCharacteristic = characteristic
+				print("BtThing: got authorizeResponseCharacteristic")
+			case SGMWBLEProfile.ControlService.Characteristics.Request.CBUUIDRepresentation:
+				self.target?.controlRequestCharacteristic = characteristic
+				print("BtThing: got controlRequestCharacteristic")
+			case SGMWBLEProfile.ControlService.Characteristics.Response.CBUUIDRepresentation:
+				self.target?.controlResponseCharacteristic = characteristic
+				print("BtThing: got controlResponseCharacteristic")
+			default:
+				print("BtThing: got unknown characteristic: \(characteristic.uuid); with description \(characteristic.description)")
+			}
+		}
+		guard self.target?.authorizeResponseCharacteristic != nil,
+			  self.target?.authorizeRequestCharacteristic != nil,
+			  self.target?.controlRequestCharacteristic != nil,
+			  self.target?.controlResponseCharacteristic != nil else { return }
+		
+		self.setAllNotification()
 	}
 	
 	private func setAllNotification() {
@@ -208,12 +241,7 @@ extension BluetoothManager {
 					switch result {
 					case .success(let isNotifying) where isNotifying:
 						print("BtThing: successfully set notify for authorize")
-						// Start a 7-second timer to wait for the car's challenge
-						self.authenticationMonitoringTask?.invalidate()
-						self.authenticationMonitoringTask = Timer.scheduledTimer(withTimeInterval: 7.0, repeats: false) { _ in
-							print("BtThing: Authorization timed out after 7 seconds.")
-							self.disconnectPeripheral(peripheral: target.peripheral)
-						}
+						// 这里调用鉴权逻辑
 					case .failure(let error):
 						print("BtThing: failed to set notify for authorize: \(error)")
 						self.disconnectPeripheral(peripheral: target.peripheral)
@@ -255,9 +283,30 @@ extension BluetoothManager {
 		}
 	}
 	
+	private func sendInitialAuthorizationRequest() {
+		guard let keyId = self.keyInfo?.keyIdHex,
+			  let key = self.keyInfo?.aes128Key,
+			  let target = self.target,
+			  let requestChar = target.authorizeRequestCharacteristic else { return }
+		
+		let timestampHex = String(format: "%08X", Int(Date().timeIntervalSince1970))
+		print("[Validation] Step A.5: Sending pre-emptive strike with timestamp \(timestampHex)")
+		
+		if let appFrame = AppAuthorizationRequestFrame(randomData2: "", randomData1: "", bleKeyId: keyId, key: key),
+		   let dataToSend = appFrame.encryptedData {
+			target.peripheral.writeValue(ofCharac: requestChar, value: dataToSend, type: .withResponse) { result in
+				if case .failure(let error) = result {
+					self.disconnectPeripheral(peripheral: target.peripheral)
+				} else {
+					print("BtThing: successfully sent initial authorization request.")
+				}
+			}
+		}
+	}
+	
+
+	// 通知回调
 	@objc private func characteristicValueUpdated(_ notification: Notification) {
-		authenticationMonitoringTask?.invalidate() // Got a response, cancel timeout timer
-		authenticationMonitoringTask = nil
 		
 		guard let characteristic = notification.userInfo?["characteristic"] as? CBCharacteristic,
 			  let data = characteristic.value else {
@@ -272,6 +321,7 @@ extension BluetoothManager {
 		}
 	}
 	
+	// 第二步
 	private func authorizeRequestCallback(data: Data) {
 		guard self.keyInfo != nil, let key = self.keyInfo!.aes128Key else { return }
 		
@@ -338,23 +388,6 @@ extension BluetoothManager {
 						self.assignCharacteristics(characteristics)
 					}
 				}
-			}
-		}
-	}
-	
-	private func assignCharacteristics(_ characteristics: [CBCharacteristic]) {
-		for characteristic in characteristics {
-			switch characteristic.uuid {
-			case SGMWBLEProfile.AuthorizeService.Characteristics.Request.CBUUIDRepresentation:
-				target?.authorizeRequestCharacteristic = characteristic
-			case SGMWBLEProfile.AuthorizeService.Characteristics.Response.CBUUIDRepresentation:
-				target?.authorizeResponseCharacteristic = characteristic
-			case SGMWBLEProfile.ControlService.Characteristics.Request.CBUUIDRepresentation:
-				target?.controlRequestCharacteristic = characteristic
-			case SGMWBLEProfile.ControlService.Characteristics.Response.CBUUIDRepresentation:
-				target?.controlResponseCharacteristic = characteristic
-			default:
-				break
 			}
 		}
 	}
