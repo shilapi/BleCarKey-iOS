@@ -10,7 +10,7 @@ import Foundation
 import OSLog
 
 let logger = Logger(
-	subsystem: "logger.carkey.com",
+	subsystem: "com.sleepyshark.carkey",
 	category: "main"
 )
 

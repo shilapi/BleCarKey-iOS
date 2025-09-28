@@ -53,7 +53,7 @@ extension E300BleKeyInfoModel {
 			loggerBle.error("failed to generate request 1: failed to convert payload to hex")
 			return ""
 		}
-		payload = "\(payload)\(String(firstPayloadCrc, radix: 16, uppercase: true))".PadZero(toLength: 64)
+		payload = "\(payload)\(String(firstPayloadCrc, radix: 16, uppercase: true))".PadZeroOnTail(toLength: 64)
 		loggerBle.debug("payload generated for request 1: \(payload)")
 		
 		return payload
@@ -72,7 +72,7 @@ extension E300BleKeyInfoModel {
 			loggerBle.error("failed to generate request 2 failed to convert payload to hex")
 			return ""
 		}
-		payload = "\(payload)\(String(firstPayloadCrc, radix: 16, uppercase: true))".PadZero(toLength: 64)
+		payload = "\(payload)\(String(firstPayloadCrc, radix: 16, uppercase: true))".PadZeroOnTail(toLength: 64)
 		loggerBle.error("payload generated for request 2: \(payload)")
 		
 		// 加密

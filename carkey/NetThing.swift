@@ -10,7 +10,7 @@ import CoreLocation
 import OSLog
 
 let loggerNet = Logger(
-	subsystem: "logger.carkey.com",
+	subsystem: "com.sleepyshark.carkey",
 	category: "net"
 )
 

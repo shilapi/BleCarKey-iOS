@@ -56,7 +56,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "ECAF7A4C-C4B6-4DAF-A856-8E64FAA88D2E"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "carkey/BtThing.swift"
@@ -66,6 +66,114 @@
             endingLineNumber = "65"
             landmarkName = "UpdateKey(key:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E0DF5F26-7A4F-43DE-8069-CB0ED9C7D9AC"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "carkey/BtThing.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "604"
+            endingLineNumber = "604"
+            landmarkName = "init(dataFrame:aesKey:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "E0DF5F26-7A4F-43DE-8069-CB0ED9C7D9AC - e7ca38647bdafaf7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "carkey.UcuAuthorizationRequestFrame1.init(dataFrame: Foundation.Data, aesKey: Foundation.Data) -&gt; carkey.UcuAuthorizationRequestFrame1"
+                  moduleName = "carkey.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lapi/Documents/Xcode/carkey/carkey/BtThing.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "604"
+                  endingLineNumber = "604">
+               </Location>
+               <Location
+                  uuid = "E0DF5F26-7A4F-43DE-8069-CB0ED9C7D9AC - e7ca38647bdafaf7"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "carkey.UcuAuthorizationRequestFrame1.init(dataFrame: Foundation.Data, aesKey: Foundation.Data) -&gt; carkey.UcuAuthorizationRequestFrame1"
+                  moduleName = "carkey.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lapi/Documents/Xcode/carkey/carkey/BtThing.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "604"
+                  endingLineNumber = "604">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9E011019-438B-4958-9C30-4FCA7CCD9DC8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "carkey/BtThing.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "572"
+            endingLineNumber = "572"
+            landmarkName = "init(dataFrame:aesKey:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3F26B117-C324-46C5-8156-BA32BBEA0986"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "carkey/BtThing.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "631"
+            endingLineNumber = "631"
+            landmarkName = "init(dataFrame:aesKey:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "3F26B117-C324-46C5-8156-BA32BBEA0986 - e7ca38647bdafd2a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "carkey.UcuAuthorizationRequestFrame2.init(dataFrame: Foundation.Data, aesKey: Foundation.Data) -&gt; carkey.UcuAuthorizationRequestFrame2"
+                  moduleName = "carkey.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lapi/Documents/Xcode/carkey/carkey/BtThing.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "632"
+                  endingLineNumber = "632">
+               </Location>
+               <Location
+                  uuid = "3F26B117-C324-46C5-8156-BA32BBEA0986 - e7ca38647bdafd4b"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "carkey.UcuAuthorizationRequestFrame2.init(dataFrame: Foundation.Data, aesKey: Foundation.Data) -&gt; carkey.UcuAuthorizationRequestFrame2"
+                  moduleName = "carkey.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/lapi/Documents/Xcode/carkey/carkey/BtThing.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "631"
+                  endingLineNumber = "631">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

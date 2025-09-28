@@ -1,5 +1,5 @@
 {
-  "originHash" : "c0996af08e05440a4de0cb35440044e199490bcc562830c07a82c78acc45bdce",
+  "originHash" : "18514c73583df4aef38a92d594c448edd3674f5cbb328fd93584b4a8c5608795",
   "pins" : [
     {
       "identity" : "cryptoswift",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "e45a26384239e028ec87fbcc788f513b67e10d8f",
         "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "logview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alexejn/LogView",
+      "state" : {
+        "revision" : "7f031eb8f0d9570e4d8a10b6291dcc94a65b3d1b",
+        "version" : "1.0.6"
       }
     },
     {

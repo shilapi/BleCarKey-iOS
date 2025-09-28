@@ -10,7 +10,7 @@ import Combine
 import OSLog
 
 let loggerData = Logger(
-	subsystem: "logger.carkey.com",
+	subsystem: "com.sleepyshark.carkey",
 	category: "data"
 )
 
@@ -168,6 +168,9 @@ class DataManager: ObservableObject {
 				return
 			}
 			self.sgmwUnifiedOAuth.updateToken(accessToken: userData.accessToken, clientSecret: userData.clientSecret)
+			loggerData.debug("SGMWOAuth token loaded")
+			updateKeyDataToBtKeyModel()
+			loggerData.debug("BLE key data loaded")
 		} catch {
 			loggerData.error("failed to decode AppData: \(error.localizedDescription)")
 			self.appData = AppData()
