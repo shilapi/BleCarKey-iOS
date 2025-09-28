@@ -57,7 +57,7 @@ extension CarData {
 extension DataManager {
     /// 这个方法只在 Debug 配置下存在
     func injectMockData() {
-        print(" MOCK: 正在注入模拟数据...")
+		loggerData.debug(" MOCK: 正在注入模拟数据...")
         DispatchQueue.main.async {
 			self.appData.userData = UserData.mock
 			self.appData.carKeyData = CarKeyData.mock

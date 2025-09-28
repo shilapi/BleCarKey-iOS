@@ -10,6 +10,7 @@
 		331F20AC2E84047100B19E7E /* carkey icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 331F20AB2E84047100B19E7E /* carkey icon.icon */; };
 		335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */; };
 		335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */ = {isa = PBXBuildFile; productRef = 335DD4412E74673100B0CE75 /* SwiftyBluetooth */; };
+		33A518D22E88BD1B0036C66D /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 33A518D12E88BD1B0036C66D /* CryptoSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 			files = (
 				335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */,
 				335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */,
+				33A518D22E88BD1B0036C66D /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +148,7 @@
 			name = carkey;
 			packageProductDependencies = (
 				335DD4412E74673100B0CE75 /* SwiftyBluetooth */,
+				33A518D12E88BD1B0036C66D /* CryptoSwift */,
 			);
 			productName = carkey;
 			productReference = 331325DF2E6E869100E86E52 /* carkey.app */;
@@ -205,7 +208,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					331325DE2E6E869100E86E52 = {
 						CreatedOnToolsVersion = 16.4;
@@ -231,6 +234,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				335DD4402E74673100B0CE75 /* XCRemoteSwiftPackageReference "SwiftyBluetooth" */,
+				33A518D02E88BD070036C66D /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 331325E02E6E869100E86E52 /* Products */;
@@ -366,6 +370,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -423,6 +428,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -616,6 +622,14 @@
 				minimumVersion = 3.1.0;
 			};
 		};
+		33A518D02E88BD070036C66D /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -623,6 +637,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 335DD4402E74673100B0CE75 /* XCRemoteSwiftPackageReference "SwiftyBluetooth" */;
 			productName = SwiftyBluetooth;
+		};
+		33A518D12E88BD1B0036C66D /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33A518D02E88BD070036C66D /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

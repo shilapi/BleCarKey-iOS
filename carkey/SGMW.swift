@@ -93,34 +93,40 @@ class SGMWUnifiedOAuth {
         self.clientSecret = nil
     }
 
-    /// 生成一个包含所有认证信息的 HTTP 请求头字典，用于网络请求。
-    /// - Returns: 一个 [String: String] 格式的请求头字典，如果未登录则返回 nil
-    public func generateAuthenticatedHeaders() -> [String: String]? {
-        
-        // 1. 调用内部方法生成动态参数 (签名, nonce, 时间戳)
-		guard let authParams = generateAuthenticationParameters(appid: "1145141919810", phone: DataManager.shared.appData.userData?.userID ?? "18000000001"),
-              let currentAccessToken = self.accessToken,
-              let currentClientSecret = self.clientSecret else {
-            print("debug: failed to generate headers")
-            return nil
-        }
-        
-        let headers: [String: String] = [
-            "sgmwclientid": Config.clientId,
-            "sgmwaccesstoken": currentAccessToken,
-            "sgmwtimestamp": authParams.timestamp,
-            "sgmwplatformno": Config.platformNo,
-            "sgmwappversion": Config.appVersion,
-            "sgmwsystem": Config.system,
-            "sgmwclientsecret": currentClientSecret,
-            "sgmwappcode": Config.appCode,
-            "sgmwsystemversion": Config.systemVersion,
-            "sgmwsignature": authParams.signature,
-            "sgmwnonce": authParams.nonce
-        ]
-        
-        return headers
-    }
+	/// 生成一个包含所有认证信息的 HTTP 请求头字典，用于网络请求。
+	/// - Returns: 一个 [String: String] 格式的请求头字典，如果未登录则返回 nil
+	public func generateAuthenticatedHeaders() -> [String: String]? {
+
+		// 1. 调用内部方法生成动态参数 (签名, nonce, 时间戳)
+		guard
+			let authParams = generateAuthenticationParameters(
+				appid: "1145141919810",
+				phone: DataManager.shared.appData.userData?.userID
+					?? "18000000001"
+			),
+			let currentAccessToken = self.accessToken,
+			let currentClientSecret = self.clientSecret
+		else {
+			loggerNet.error("failed to generate SGMWOAuth headers")
+			return nil
+		}
+
+		let headers: [String: String] = [
+			"sgmwclientid": Config.clientId,
+			"sgmwaccesstoken": currentAccessToken,
+			"sgmwtimestamp": authParams.timestamp,
+			"sgmwplatformno": Config.platformNo,
+			"sgmwappversion": Config.appVersion,
+			"sgmwsystem": Config.system,
+			"sgmwclientsecret": currentClientSecret,
+			"sgmwappcode": Config.appCode,
+			"sgmwsystemversion": Config.systemVersion,
+			"sgmwsignature": authParams.signature,
+			"sgmwnonce": authParams.nonce,
+		]
+
+		return headers
+	}
 
     // 私有辅助方法
     

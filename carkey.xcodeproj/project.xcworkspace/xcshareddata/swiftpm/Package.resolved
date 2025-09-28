@@ -1,6 +1,15 @@
 {
-  "originHash" : "4ca7694c1ec25c4fc55dc34823b2380aaaeb3e7e89ac04d2da68f68578a5248e",
+  "originHash" : "c0996af08e05440a4de0cb35440044e199490bcc562830c07a82c78acc45bdce",
   "pins" : [
+    {
+      "identity" : "cryptoswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CryptoSwift",
+      "state" : {
+        "revision" : "e45a26384239e028ec87fbcc788f513b67e10d8f",
+        "version" : "1.9.0"
+      }
+    },
     {
       "identity" : "swiftybluetooth",
       "kind" : "remoteSourceControl",

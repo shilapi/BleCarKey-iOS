@@ -7,6 +7,12 @@
 import Foundation
 import UIKit
 import CoreLocation
+import OSLog
+
+let loggerNet = Logger(
+	subsystem: "logger.carkey.com",
+	category: "net"
+)
 
 // api请求协议
 protocol EndpointType {
@@ -115,7 +121,7 @@ extension NetworkManager {
                 }
             } else {
                 // 处理未登录或无法生成签名的情况
-                print("debug: failed to generate SGMW OAuth auth header")
+				loggerNet.error("failed to generate SGMW OAuth auth header")
             }
         
         // Advanced device info
@@ -164,7 +170,7 @@ extension DataManager {
                             self?.loadCarData(from: responseString)
                         }
                     case .failure(let error):
-                        print("Error: \(error)")
+						loggerNet.error("failed to load car data: \(error)")
                 }
             }
         }
@@ -184,7 +190,7 @@ extension DataManager {
                             self?.loadKeyData(from: responseString)
                         }
                     case .failure(let error):
-                        print("Error: \(error)")
+						loggerNet.error("failed to load car key data: \(error)")
                 }
             }
         }

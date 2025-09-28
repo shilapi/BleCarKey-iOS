@@ -7,6 +7,12 @@
 
 import SwiftUI
 import Foundation
+import OSLog
+
+let logger = Logger(
+	subsystem: "logger.carkey.com",
+	category: "main"
+)
 
 @main
 struct carkeyApp: App {

@@ -7,6 +7,12 @@
 import Foundation
 import SwiftUI
 import Combine
+import OSLog
+
+let loggerData = Logger(
+	subsystem: "logger.carkey.com",
+	category: "data"
+)
 
 // MARK: - 数据结构
 struct UserData: Codable {
@@ -151,18 +157,23 @@ class DataManager: ObservableObject {
     private init() {
 		guard let data = try? Data(contentsOf: DataManager.archiveURL()) else {
 			self.appData = AppData()
-			print("DataManager: failed to load local user data: not exist")
+			loggerData.error("failed to load local user data: not exist")
 			return
 		}
 		do {
 			let decoder = JSONDecoder()
 			self.appData = try decoder.decode(AppData.self, from: data)
+			guard let userData = self.appData.userData else {
+				loggerData.error("failed to load user data for SGMWOAuth")
+				return
+			}
+			self.sgmwUnifiedOAuth.updateToken(accessToken: userData.accessToken, clientSecret: userData.clientSecret)
 		} catch {
-			print("DataManager：failed to decode AppData: \(error.localizedDescription)")
+			loggerData.error("failed to decode AppData: \(error.localizedDescription)")
 			self.appData = AppData()
 			return
 		}
-		print("DataManager: load local user data successfully")
+		loggerData.debug("load local user data successfully")
 	}
 }
 
@@ -174,9 +185,9 @@ extension DataManager {
 			encoder.outputFormatting = .prettyPrinted
 			let data = try encoder.encode(appData)
 			try data.write(to: DataManager.archiveURL())
-			print("DataManager: save local user data successfully")
+			loggerData.debug("save local user data successfully")
 		} catch {
-			print("DataManager: failed to save local user data: \(error.localizedDescription)")
+			loggerData.error("failed to save local user data: \(error.localizedDescription)")
 		}
 	}
 	
@@ -184,7 +195,7 @@ extension DataManager {
         let newUser = UserData(userName: userName, accessToken: accessToken, clientSecret: clientSecret, userID: userID)
         DispatchQueue.main.async {
 			self.appData.userData = newUser
-            print("debug: logged in as \(newUser.userID)")
+			loggerData.info("logged in as \(newUser.userID)")
         }
         sgmwUnifiedOAuth.updateToken(accessToken: newUser.accessToken, clientSecret: newUser.clientSecret)
     }
@@ -194,7 +205,7 @@ extension DataManager {
 			self.appData.userData = nil
 			self.appData.carKeyData = nil
 			self.appData.carData = nil
-            print("debug: logged out")
+			loggerData.info("logged out")
         }
     }
 
@@ -204,43 +215,50 @@ extension DataManager {
         do {
             let apiResponse = try JSONDecoder().decode(CarKeyAPIResponse.self, from: jsonData)
             guard apiResponse.result else {
-                print("loadKeyData: failed to load BLE key: server returned false")
+				loggerData.error("failed to load BLE key: server returned false")
                 return
             }
-
 			self.appData.carKeyData = apiResponse.data
-			var keyInfo = E300BleKeyInfoModel()
-			keyInfo.aes128Key = self.appData.carKeyData!.masterKey.data(using: .utf8)
-			keyInfo.bleMacStr = self.appData.carKeyData!.bleMacString
-			if let intValue = Int(self.appData.carKeyData!.keyId) {
-				keyInfo.keyIdHex = String(intValue, radix: 16)}
-			BluetoothManager.shared.keyInfo = keyInfo
-			print("loadKeyData: BLE key data loaded for VIN: \(apiResponse.data.vin)")
-            
+			updateKeyDataToBtKeyModel()
+			loggerData.debug("BLE key data loaded for VIN: \(apiResponse.data.vin)")
         } catch {
-            print("loadKeyData: failed to load BLE key: \(error)")
+			loggerData.error("failed to load BLE key: \(error)")
         }
     }
+	
+	func updateKeyDataToBtKeyModel() {
+		guard let keyData = self.appData.carKeyData else {
+			loggerData.error("failed to update key data to ble key model")
+			return
+		}
+		let keyInfo = E300BleKeyInfoModel(
+			bleMac: keyData.bleMac,
+			keyId: keyData.keyId,
+			masterKey: keyData.masterKey,
+			keyMasterRandom: keyData.keyMasterRandom
+		)
+		BluetoothManager.shared.UpdateKey(key: keyInfo)
+	}
 
     /// 从JSON加载并更新车辆综合数据
     func loadCarData(from jsonString: String) {
         guard let jsonData = jsonString.data(using: .utf8) else {
-            print("loadCarData: failed to parse car data json")
+			loggerData.error("failed to parse car data json")
             return
         }
         
         do {
             let apiResponse = try JSONDecoder().decode(VehicleAPIResponse.self, from: jsonData)
             guard apiResponse.result else {
-                print("loadCarData: API returned false")
+				loggerData.error("API returned false")
                 return
             }
             DispatchQueue.main.async {
 				self.appData.carData = apiResponse.data
-                print("loadCarData: successed for \(apiResponse.data.carInfo.carTypeName)")
+				loggerData.debug("successfully load car data for \(apiResponse.data.carInfo.carTypeName)")
             }
         } catch {
-            print("loadCarData: failed to parse car data json: \(error)")
+			loggerData.error("failed to parse car data json: \(error)")
         }
     }
 }

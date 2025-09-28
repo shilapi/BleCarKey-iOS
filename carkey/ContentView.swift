@@ -1,5 +1,11 @@
 import SwiftUI
 import Foundation
+import OSLog
+
+let loggerView = Logger(
+	subsystem: "logger.carkey.com",
+	category: "view"
+)
 
 // MARK: - Reusable UI Components
 
@@ -122,8 +128,7 @@ struct CarInfoView: View {
             //.scrollContentBackground(.hidden)
             .refreshable {
                 // 在这里调用您的刷新逻辑
-                print("正在刷新 CarInfo 数据...")
-                
+				loggerView.debug("refetching car info data")
                 dataManager.fetchAndLoadCarData()
             }
         }
@@ -153,7 +158,7 @@ struct CarKeyInfoView: View {
         .navigationTitle("密钥详情")
         .refreshable {
             // 在这里调用您的刷新逻辑
-            print("正在刷新 CarKeyInfo 数据...")
+			loggerView.debug("refetching car key data")
             dataManager.fetchAndLoadKeyData()
         }
     }
@@ -215,7 +220,7 @@ struct UserInfoView: View {
                     } else {
                         Text("请从Debug页注入数据或登录")
                         Button(action: {
-                            DataManager.shared.login(userName: "Shilapi", accessToken: "11757674032836231D7M2N4F2L7G1ZCC3AE0B3495442779FD1BF79A71C0FE7L6", clientSecret: "c5ad2a4290faa3df39683865c2e10310", userID: "18501754337")
+                            DataManager.shared.login(userName: "Shilapi", accessToken: "117582730164062Q137Z2B48227S1Y67FA99C2E07843D0A6F24DBC730990C6P6", clientSecret: "c5ad2a4290faa3df39683865c2e10310", userID: "18501754337")
                         }) {
                             Text("登录")
                                 .frame(maxWidth: .infinity)
@@ -256,7 +261,7 @@ struct DebugView: View {
                 }
                 
                 Section(header: Text("蓝牙")) {
-                    Text("当前状态： \(bt.state)")
+                    Text("当前状态： \(String(describing: bt.state))")
                     
                     Section(header: Text("发现的设备 (\(bt.avaliblePeripherals.count))")) {
                         if bt.avaliblePeripherals.isEmpty {
