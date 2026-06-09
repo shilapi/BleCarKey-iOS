@@ -8,6 +8,18 @@ let loggerView = Logger(
 	category: "view"
 )
 
+// MARK：- haptic helper
+
+func simpleHaptic(type: UINotificationFeedbackGenerator.FeedbackType) {
+	let generator = UINotificationFeedbackGenerator()
+	generator.notificationOccurred(type)
+}
+
+func simpleImpact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+	let generator = UIImpactFeedbackGenerator(style: style)
+	generator.impactOccurred()
+}
+
 // MARK: - Reusable UI Components
 
 /// 用于显示“左边粗体标签，右边值”的通用行视图
@@ -31,14 +43,16 @@ struct ApiStatusView: View {
 	let lastUpdateTime: String?
 
 	var body: some View {
-		Section {
-			HStack {
-				Spacer()
-				Text(statusText)
-					.font(.footnote)  // 使用小号字体
-					.foregroundColor(.secondary)  // 使用非常柔和的灰色
-				Spacer()
-			}
+		if #available(iOS 26.0, *) {
+			Text(statusText)
+				.font(.footnote)  // 使用小号字体
+				.foregroundColor(.secondary)
+				.frame(minWidth: statusText.size(withAttributes: [.font: UIFont.systemFont(ofSize: 14)]).width + 20, minHeight: 40)
+				.glassEffect()
+		} else {
+			Text(statusText)
+				.font(.footnote)  // 使用小号字体
+				.foregroundColor(.secondary)
 		}
 	}
 
@@ -53,109 +67,6 @@ struct ApiStatusView: View {
 // MARK: - Tab Views
 
 // --- 车辆信息 Tab ---
-struct CarInfoView: View {
-	@ObservedObject private var dataManager = DataManager.shared
-
-	var body: some View {
-		NavigationView {
-			List {
-				if dataManager.appData.carData != nil {
-					// 1. 使用 ZStack 作为根容器来实现层叠效果
-					ZStack(alignment: .topLeading) {  // 默认对齐方式设为左上
-
-						// 背景层：为了撑开 ZStack 的高度，并让图片有对齐的参考空间
-						// 我们用一个透明色块来隐式定义高度
-						Color.clear.frame(height: 180)  // 你可以根据需要调整这个高度
-
-						// 文字层 (VStack)
-						VStack(alignment: .leading, spacing: -20) {
-							Text("ALL")
-							Text("GOOD")
-						}
-						// 将字体样式统一应用到 VStack，它会自动传递给内部的 Text
-						.font(
-							.system(size: 75, weight: .heavy, design: .default)
-						)
-						.frame(maxWidth: .infinity, alignment: .leading)  // 确保 VStack 在 ZStack 内靠左
-
-						// 图片层 (Image)
-						Image("EQ100")  // 确保你的项目中有名为 "EQ100" 的图片资源
-							.resizable()
-							.scaledToFit()
-							.frame(width: 400)  // 给图片一个合适的尺寸
-							.frame(
-								maxWidth: .infinity,
-								maxHeight: .infinity,
-								alignment: .bottomTrailing
-							)
-							.padding(.bottom, -50)
-							.padding(.trailing, -50)
-						Color.clear.frame(height: 240)
-					}
-					// 这两个修改器应用在 ZStack 上，确保它在 List 中正确显示
-					.listRowInsets(EdgeInsets())  // 移除 List 的默认行边距，让 ZStack 占满整个宽度
-					.listRowBackground(Color.clear)
-				}
-
-				Section(header: Text("核心状态")) {
-					if let status = dataManager.appData.carData?.carStatus {
-						InfoRowView(label: "车辆状态", value: status.statusName)
-						InfoRowView(
-							label: "剩余续航",
-							value: "\(status.remainingMileage ?? 0) KM"
-						)
-						InfoRowView(
-							label: "电池电量",
-							value: "\(status.batterySOCPercentage ?? 0)%"
-						)
-						InfoRowView(label: "总里程", value: "\(status.mileage) KM")
-						InfoRowView(
-							label: "车内温度",
-							value: "\(status.interiorTemp ?? 0)°C"
-						)
-					} else {
-						Text("请下拉刷新或从Debug页注入数据")
-					}
-				}
-
-				Section(header: Text("车辆信息")) {
-					if let info = dataManager.appData.carData?.carInfo {
-						InfoRowView(label: "车型", value: info.carTypeName)
-						InfoRowView(label: "车名", value: info.carName)
-						InfoRowView(label: "颜色", value: info.colorName)
-
-						// 二级菜单入口
-						NavigationLink(destination: CarKeyInfoView()) {
-							Text("查看蓝牙密钥详情").bold()
-						}
-					} else {
-						Text("无车辆信息")
-					}
-				}
-
-				ApiStatusView(
-					error: nil,
-					lastUpdateTime: dataManager.appData.carData?.carStatus
-						.collectTime
-				)
-				.listRowSeparator(.hidden)
-				.padding(.vertical)
-				.listRowBackground(Color.clear)
-				.listRowInsets(
-					EdgeInsets(top: -10, leading: 0, bottom: 20, trailing: 0)
-				)
-
-			}
-			// .navigationTitle("车辆信息")
-			//.scrollContentBackground(.hidden)
-			.refreshable {
-				// 在这里调用您的刷新逻辑
-				loggerView.debug("refetching car info data")
-				dataManager.fetchAndLoadCarData()
-			}
-		}
-	}
-}
 
 // --- 蓝牙密钥二级页面 ---
 struct CarKeyInfoView: View {
@@ -391,7 +302,7 @@ struct MainTabView: View {
 
 	var body: some View {
 		TabView {
-			CarInfoView()
+			CarControlsView()
 				.tabItem {
 					Label("车辆", systemImage: "car.fill")
 				}

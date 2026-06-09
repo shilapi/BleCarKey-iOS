@@ -11,12 +11,25 @@ enum BleCommandType {
 	enum Service {
 		static let PhoneAuthRequest = "38C7"
 		static let CarAuthResponse = "A857"
+		
+		static let PhoneControlRequest = "39D6"
+		static let CarControlResponse = "A956"
 	}
 	
 	enum Subfunc {
 		static let AuthRound1 = "0001"
 		static let AuthRound2 = "0002"
+		
+		static let Control = "0001"
 	}
+}
+
+enum ControlFunctionList: String {
+
+	case doorLockAll = "0102F2000000"
+	case doorUnlockAll = "0101F2000000"
+		
+	case powerOff = "0309000000"
 }
 
 struct E300BleKeyInfoModel {
@@ -37,12 +50,22 @@ struct E300BleKeyInfoModel {
 		let keyMasterRandomData = keyMasterRandom.ToDataFromHexString()!
 		self.authAesKey = masterKeyData.xor(withData: keyMasterRandomData)
 		
-		self.randomData2 = String(Int.random(in: 0...0xFFFFFFFF), radix: 16, uppercase: true)
+		self.randomData2 = GenerateRandomHex8()
 		self.timestamp = String(Int(Date().timeIntervalSince1970), radix: 16, uppercase: true)
 	}
 }
 
 extension E300BleKeyInfoModel {
+	mutating func UpdateControlKey() {
+		guard let random1 = self.randomData1 else {
+			loggerBle.error("failed to retrieve random1 while attempting to update control key")
+			return
+		}
+		let newControlAesKey = Data(hex: "\(random1)\(self.randomData2)\(random1)\(self.randomData2)")
+		self.controlAesKey = newControlAesKey
+		loggerBle.debug("control key updated: \(newControlAesKey)")
+	}
+	
 	func GenerateRequest1() -> String{
 		// 第一次request是明文
 		let service = BleCommandType.Service.PhoneAuthRequest
@@ -78,6 +101,33 @@ extension E300BleKeyInfoModel {
 		// 加密
 		do {
 			let encryptedPayload = try AES(key: Array(self.authAesKey), blockMode: ECB(), padding: .noPadding).encrypt(Array(Data(hex: payload)))
+			loggerBle.debug("payload encrypted for request 2: \(encryptedPayload)")
+			return Data(encryptedPayload).toHexString()
+		} catch {
+			loggerBle.error("payload encrypt error for request2")
+			return payload
+		}
+	}
+	
+	func GenerateControlRequest(function: ControlFunctionList, randomNum: String) -> String {
+		let service = BleCommandType.Service.PhoneControlRequest
+		let subfunc = BleCommandType.Subfunc.Control
+		guard let controlAesKey = self.controlAesKey else {
+			loggerBle.error("failed to generate control request: no aes key")
+			return ""
+		}
+		
+		var payload = "\(service)\(subfunc)00000000\(randomNum)\(self.keyIdHex.PadZero(toLength: 8))06\(function.rawValue)"
+		guard let firstPayloadCrc = payload.ToDataFromHexString()?.Crc16Checksum() else {
+			loggerBle.error("failed to generate control request: failed to convert payload to hex")
+			return ""
+		}
+		payload = "\(payload)\(String(firstPayloadCrc, radix: 16, uppercase: true))".PadZeroOnTail(toLength: 64)
+		loggerBle.error("payload generated for control request: \(payload)")
+		
+		// 加密
+		do {
+			let encryptedPayload = try AES(key: Array(controlAesKey), blockMode: ECB(), padding: .noPadding).encrypt(Array(Data(hex: payload)))
 			loggerBle.debug("payload encrypted for request 2: \(encryptedPayload)")
 			return Data(encryptedPayload).toHexString()
 		} catch {

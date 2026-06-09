@@ -63,6 +63,22 @@ struct VehicleAPIResponse: Codable {
 struct CarData: Codable {
     let carStatus: CarStatus
     let carInfo: CarInfo
+	let updateDate: String
+	
+	private enum CodingKeys: String, CodingKey {
+		case carStatus
+		case carInfo
+	}
+	
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		
+		carStatus = try container.decode(CarStatus.self, forKey: .carStatus)
+		carInfo = try container.decode(CarInfo.self, forKey: .carInfo)
+		
+		// 2. 在解码的过程中，为这个存储属性【仅赋值一次】
+		updateDate = Date().formatted(date: .numeric, time: .standard)
+	}
 }
 
 struct CarStatus: Codable {

@@ -52,10 +52,12 @@ class BluetoothManager: ObservableObject {
 	@Published var avaliblePeripherals = [Peripheral]()
 	@Published var target: BleTarget?
 	@Published var state: BluetoothManagerState = .disconnected
+	@Published var isConnected: Bool = false
 
 	private var isFound = false
 
 	private init() {
+		
 	}
 }
 
@@ -71,25 +73,31 @@ extension BluetoothManager {
 
 	func startScan() {
 		loggerBle.info("scan start")
-		self.state = .scanning
+		DispatchQueue.main.async {
+			self.state = .scanning
+		}
 		self.isFound = false
 
 		SwiftyBluetooth.scanForPeripherals(
 			withServiceUUIDs: nil,
-			timeoutAfter: 15
+			timeoutAfter: 8
 		) { scanResult in
 			switch scanResult {
 			case .scanStarted:
-				self.state = .scanning
+				DispatchQueue.main.async {
+					self.state = .scanning
+				}
 			case .scanResult(let peripheral, let advertisementData, _):
 				self.onScanMatchCallback(
 					peripheral: peripheral,
-					advertisementData: advertisementData
+					advertisementData: advertisementData 
 				)
 			case .scanStopped(let peripherals, let error):
 				loggerBle.info("scan ended")
 				if self.state == .scanning {
-					self.state = .disconnected
+					DispatchQueue.main.async {
+						self.state = .disconnected
+					}
 				}
 				self.avaliblePeripherals = peripherals
 				if let error = error {
@@ -153,14 +161,18 @@ extension BluetoothManager {
 
 			case .failure(let error):
 				loggerBle.error("failed to connect: \(error)")
-				self.state = .disconnected
+				DispatchQueue.main.async {
+					self.state = .disconnected
+				}
 			}
 		}
 	}
 
 	private func startServiceDiscovery(for peripheral: Peripheral) {
 		loggerBle.info("starting discovery flow...")
-		self.state = .authorizing
+		DispatchQueue.main.async {
+			self.state = .authorizing
+		}
 
 		peripheral.discoverServices(withUUIDs: nil) { [weak self] result in
 			guard let self = self else { return }
@@ -513,9 +525,12 @@ extension BluetoothManager {
 	}
 
 	private func authOK() {
-		self.state = .connected
+		DispatchQueue.main.async {
+			self.state = .connected
+		}
+		self.keyInfo!.UpdateControlKey()
 		loggerBle.info(
-			"\(String(describing: self.target!.peripheral.name)) connected and authorized!"
+			"\(String(self.target!.peripheral.name!)) connected and authorized!"
 		)
 	}
 
@@ -531,7 +546,9 @@ extension BluetoothManager {
 
 	@objc private func peripheralDidDisconnect(_ notification: Notification) {
 		loggerBle.warning("target disconnected by notify")
-		self.state = .disconnected
+		DispatchQueue.main.async {
+			self.state = .disconnected
+		}
 		self.target = nil
 
 		if let peripheral = notification.object as? Peripheral {
@@ -555,7 +572,56 @@ extension BluetoothManager {
 	}
 }
 
-// MARK: - App/UCU Data Frames (Unaltered)
+// MARK: - Control
+
+extension BluetoothManager {
+	// RandomNumber为任意8位hexstring
+	func GeneralControl(function: ControlFunctionList, randomNumber: String) {
+		guard let keyInfo = self.keyInfo else {
+			loggerBle.error("failed to send control request \(randomNumber), no key data")
+			return
+		}
+		guard let target = self.target,
+			  let requestChar = target.controlRequestCharacteristic
+		else { return }
+		
+		if let payload = keyInfo.GenerateControlRequest(function: function, randomNum: randomNumber).ToDataFromHexString() {
+			target.peripheral.writeValue(
+				ofCharac: requestChar,
+				value: payload,
+				type: .withResponse
+			) { result in
+				if case .failure(let error) = result {
+					loggerBle.error(
+						"failed to send control request \(randomNumber) : \(error)"
+					)
+				} else {
+					loggerBle.info(
+						"successfully sent control request \(randomNumber)"
+					)
+				}
+			}
+		}
+	}
+	
+	func CarLock() {
+		let random = GenerateRandomHex8()
+		self.GeneralControl(function: ControlFunctionList.doorLockAll, randomNumber: random)
+	}
+	
+	func CarUnlock() {
+		let random = GenerateRandomHex8()
+		self.GeneralControl(function: ControlFunctionList.doorUnlockAll, randomNumber: random)
+	}
+	
+	func CarPowerOff() {
+		let random = GenerateRandomHex8()
+		self.GeneralControl(function: ControlFunctionList.powerOff, randomNumber: random)
+	}
+}
+
+
+// MARK: - App/UCU Data Frames
 
 // UCU -> App 的响授权响应帧1
 struct UcuAuthorizationRequestFrame1 {
@@ -563,7 +629,7 @@ struct UcuAuthorizationRequestFrame1 {
 
 	init(dataFrame: Data, aesKey: Data) {
 		do {
-			var dataHex:String = dataFrame.toHexString()
+			var dataHex: String = dataFrame.toHexString()
 			if dataHex[0...1] != "00" {
 				loggerBle.error("recieved data not encrypted!")
 			}
@@ -598,11 +664,13 @@ struct UcuAuthorizationRequestFrame1 {
 			self.subfunction = String(subFunc)
 			self.random1 = String(random1)
 			self.blekey = String(blekey)
-			
+
 			return
 
 		} catch {
-			loggerBle.error("got unexpected error, probably decrypt error: \(error)")
+			loggerBle.error(
+				"got unexpected error, probably decrypt error: \(error)"
+			)
 			self.serviceId = ""
 			self.subfunction = ""
 			self.random1 = ""
@@ -617,7 +685,7 @@ struct UcuAuthorizationRequestFrame2 {
 
 	init(dataFrame: Data, aesKey: Data) {
 		do {
-			var dataHex:String = dataFrame.toHexString()
+			var dataHex: String = dataFrame.toHexString()
 			if dataHex[0...1] != "00" {
 				loggerBle.error("recieved data not encrypted!")
 			}
@@ -652,7 +720,7 @@ struct UcuAuthorizationRequestFrame2 {
 			self.subfunction = String(subFunc)
 			self.random2 = String(random2)
 			self.blekey = String(blekey)
-			
+
 			return
 
 		} catch {
@@ -667,39 +735,6 @@ struct UcuAuthorizationRequestFrame2 {
 
 // MARK: - Debug View (Unaltered)
 
-#if DEBUG
-	struct BtDebugView: View {
-		@StateObject var bt = BluetoothManager.shared
-
-		var body: some View {
-			NavigationView {
-				List {
-					Section(header: Text("Bluetooth")) {
-						Text("Current State: \(bt.state.description)")
-						Button(
-							"Start Scan",
-							action: {
-								bt.startScan()
-							}
-						)
-					}
-
-					Section(header: Text("Discovered Peripherals")) {
-						if bt.avaliblePeripherals.isEmpty {
-							Text("None")
-						} else {
-							ForEach(bt.avaliblePeripherals) { peripheral in
-								Text(peripheral.id)
-							}
-						}
-					}
-				}
-				.navigationTitle("BT Debug")
-			}
-		}
-	}
-
-	#Preview {
-		BtDebugView()
-	}
-#endif
+func GenerateRandomHex8() -> String {
+	String(Int.random(in: 0...0xFFFFFFFF), radix: 16, uppercase: true)
+}
