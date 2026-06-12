@@ -15,7 +15,7 @@ extension UserData {
     static var mock: UserData {
         UserData(userName: "Mock User",
                  accessToken: "mock_access_token_12345",
-                 clientSecret: "mock_client_secret_67890",
+				 clientSecret: "mock_client_secret_67890",
                  userID: "18812345678")
     }
 }

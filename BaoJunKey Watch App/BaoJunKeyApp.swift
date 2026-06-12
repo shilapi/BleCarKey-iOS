@@ -2,7 +2,7 @@
 //  BaoJunKeyApp.swift
 //  BaoJunKey Watch App
 //
-//  Created by Shilapi Chen on 6/11/26.
+//  Watch app entry point with environment objects
 //
 
 import SwiftUI
@@ -12,6 +12,8 @@ struct BaoJunKey_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(WatchBluetoothManager.shared)
+                .environmentObject(WatchDataManager.shared)
         }
     }
 }

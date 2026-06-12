@@ -73,34 +73,35 @@ struct CarKeyInfoView: View {
 	@ObservedObject private var dataManager = DataManager.shared
 
 	var body: some View {
-		List {
-			Section(header: Text("蓝牙密钥详情")) {
-				if let keyData = dataManager.appData.carKeyData {
-					InfoRowView(
-						label: "密钥ID",
-						value: keyData.keyId.masked(percentage: 0.7)
-					)
-					InfoRowView(label: "密钥类型", value: keyData.keyType)
-					InfoRowView(
-						label: "VIN码",
-						value: keyData.vin.masked(percentage: 0.7)
-					)
-					InfoRowView(
-						label: "用户ID",
-						value: keyData.userId.masked(percentage: 0.7)
-					)
-					InfoRowView(
-						label: "蓝牙MAC",
-						value: keyData.bleMac.masked(percentage: 0.7)
-					)
-					InfoRowView(label: "失效时间", value: keyData.endTime)
-					InfoRowView(label: "采集时间", value: keyData.collectTime)
-				} else {
-					Text("请下拉刷新或从Debug页注入数据")
+		NavigationView {
+			List {
+				Section(header: Text("蓝牙密钥详情")) {
+					if let keyData = dataManager.appData.carKeyData {
+						InfoRowView(
+							label: "密钥ID",
+							value: keyData.keyId.masked(percentage: 0.7)
+						)
+						InfoRowView(label: "密钥类型", value: keyData.keyType)
+						InfoRowView(
+							label: "VIN码",
+							value: keyData.vin.masked(percentage: 0.7)
+						)
+						InfoRowView(
+							label: "用户ID",
+							value: keyData.userId.masked(percentage: 0.7)
+						)
+						InfoRowView(
+							label: "蓝牙MAC",
+							value: keyData.bleMac.masked(percentage: 0.7)
+						)
+						InfoRowView(label: "失效时间", value: keyData.endTime)
+						InfoRowView(label: "采集时间", value: keyData.collectTime)
+					} else {
+						Text("请下拉刷新或从Debug页注入数据")
+					}
 				}
-			}
+			}.navigationTitle("密钥详情")
 		}
-		.navigationTitle("密钥详情")
 		.refreshable {
 			// 在这里调用您的刷新逻辑
 			loggerView.debug("refetching car key data")
@@ -182,12 +183,13 @@ struct UserInfoView: View {
 								value: String(user.accessToken.prefix(10) + "...")
 									.masked(percentage: 0.7)
 							)
+						}
 							Button{
 								DataManager.shared.logout()
 							} label: {
 								Text("Logout")
 							}.foregroundStyle(.red)
-						}
+						
 					} else {
 						VStack(alignment: .leading, spacing: 15) {
 							Text("请获取token登录")
@@ -375,6 +377,11 @@ struct MainTabView: View {
 			UserInfoView()
 				.tabItem {
 					Label("我的", systemImage: "person.fill")
+				}
+			
+			CarKeyInfoView()
+				.tabItem {
+					Label("钥匙", systemImage: "key.fill")
 				}
 
 			// 仅在 DEBUG 模式下编译，且仅在预览时显示

@@ -13,6 +13,7 @@
 		335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */ = {isa = PBXBuildFile; productRef = 335DD4412E74673100B0CE75 /* SwiftyBluetooth */; };
 		33A518D22E88BD1B0036C66D /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 33A518D12E88BD1B0036C66D /* CryptoSwift */; };
 		33F9079F2FDA56CD00741A4F /* BaoJunKey Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		33F9080A2FDBFD7C00741A4F /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 33A518D12E88BD1B0036C66D /* CryptoSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33F9080A2FDBFD7C00741A4F /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,6 +261,7 @@
 			);
 			name = "BaoJunKey Watch App";
 			packageProductDependencies = (
+				33A518D12E88BD1B0036C66D /* CryptoSwift */,
 			);
 			productName = "BaoJunKey Watch App";
 			productReference = 33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */;
@@ -671,6 +674,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = BaoJunKey;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "使用蓝牙连接车辆以控制车锁";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sleepyshark.carkey;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -689,7 +693,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
@@ -704,6 +708,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = BaoJunKey;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "使用蓝牙连接车辆以控制车锁";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sleepyshark.carkey;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -722,7 +727,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};

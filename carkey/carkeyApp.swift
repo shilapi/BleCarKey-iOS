@@ -16,6 +16,10 @@ let logger = Logger(
 
 @main
 struct carkeyApp: App {
+    init() {
+        WatchSyncManager.shared.startSession()
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabView()

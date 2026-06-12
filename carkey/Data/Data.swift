@@ -217,6 +217,7 @@ extension DataManager {
 			loggerData.info("logged in as \(newUser.userID)")
         }
         sgmwUnifiedOAuth.updateToken(accessToken: newUser.accessToken, clientSecret: newUser.clientSecret)
+        WatchSyncManager.shared.sendAppData(self.appData)
     }
 
     func logout() {
@@ -240,6 +241,7 @@ extension DataManager {
 			self.appData.carKeyData = apiResponse.data
 			updateKeyDataToBtKeyModel()
 			loggerData.debug("BLE key data loaded for VIN: \(apiResponse.data.vin)")
+	        WatchSyncManager.shared.sendAppData(self.appData)
         } catch {
 			loggerData.error("failed to load BLE key: \(error)")
         }
@@ -276,6 +278,7 @@ extension DataManager {
 				self.appData.carData = apiResponse.data
 				loggerData.debug("successfully load car data for \(apiResponse.data.carInfo.carTypeName)")
             }
+	        WatchSyncManager.shared.sendAppData(self.appData)
         } catch {
 			loggerData.error("failed to parse car data json: \(error)")
         }
