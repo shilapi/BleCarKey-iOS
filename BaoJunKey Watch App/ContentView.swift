@@ -10,10 +10,28 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+			Button{
+				
+			} label: {
+				Image("Bluetooth_capsule")
+					.imageScale(.large)
+			}.buttonBorderShape(.circle)
+			
+			Text("Current connectivity:")
+			
+			HStack{
+				Button{
+					
+				} label: {
+					Image(systemName: "lock.open.fill")
+				}
+				
+				Button{
+					
+				} label: {
+					Image(systemName: "lock.fill")
+				}
+			}
         }
         .padding()
     }

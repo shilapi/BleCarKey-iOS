@@ -153,40 +153,105 @@ extension String {
 // --- 用户信息 Tab ---
 struct UserInfoView: View {
 	@ObservedObject private var dataManager = DataManager.shared
+	
+	@State private var accesstoken_input = ""
+	@State private var userid_input = ""
+	@State private var secret_input = ""
+	@State private var name_input = ""
+	
+	var canContinue:Bool {
+		if accesstoken_input.isEmpty { return false }
+		if userid_input.isEmpty { return false }
+		if secret_input.isEmpty { return false }
+		if name_input.isEmpty { return false }
+		return true
+	}
 
 	var body: some View {
 		NavigationView {
-			List {
-				Section(header: Text("账户信息")) {
+			VStack(alignment:.leading, spacing: 45) {
 					if let user = dataManager.appData.userData {
-						InfoRowView(label: "用户名", value: user.userName)
-						InfoRowView(
-							label: "用户ID (手机)",
-							value: user.userID.masked(percentage: 0.7)
-						)
-						InfoRowView(
-							label: "Access Token",
-							value: String(user.accessToken.prefix(10) + "...")
-								.masked(percentage: 0.7)
-						)
-					} else {
-						Text("请从Debug页注入数据或登录")
-						Button(action: {
-							DataManager.shared.login(
-								userName: "Shilapi",
-								accessToken:
-									"117582730164062Q137Z2B48227S1Y67FA99C2E07843D0A6F24DBC730990C6P6",
-								clientSecret:
-									"c5ad2a4290faa3df39683865c2e10310",
-								userID: "18501754337"
+						List{
+							InfoRowView(label: "用户名", value: user.userName)
+							InfoRowView(
+								label: "用户ID (手机)",
+								value: user.userID.masked(percentage: 0.7)
 							)
-						}) {
-							Text("登录")
-								.frame(maxWidth: .infinity)
+							InfoRowView(
+								label: "Access Token",
+								value: String(user.accessToken.prefix(10) + "...")
+									.masked(percentage: 0.7)
+							)
+							Button{
+								DataManager.shared.logout()
+							} label: {
+								Text("Logout")
+							}.foregroundStyle(.red)
 						}
-						.buttonStyle(.bordered)
+					} else {
+						VStack(alignment: .leading, spacing: 15) {
+							Text("请获取token登录")
+								.font(.callout)
+								.foregroundColor(.secondary)
+								.padding(.vertical, 10)
+							TextField("昵称", text: $name_input)
+								.textFieldStyle(.plain)
+								.padding(.vertical, 18)
+								.padding(.horizontal, 10)
+								.background(Color(.secondarySystemBackground))
+								.cornerRadius(20)
+								.autocapitalization(.none)
+								.disableAutocorrection(true)
+							
+							TextField("AccessToken", text: $accesstoken_input)
+								.textFieldStyle(.plain)
+								.padding(.vertical, 18)
+								.padding(.horizontal, 10)
+								.background(Color(.secondarySystemBackground))
+								.cornerRadius(20)
+								.autocapitalization(.none)
+								.disableAutocorrection(true)
+							
+							TextField("ClientSecret", text: $secret_input)
+								.textFieldStyle(.plain)
+								.padding(.vertical, 18)
+								.padding(.horizontal, 10)
+								.background(Color(.secondarySystemBackground))
+								.cornerRadius(20)
+								.autocapitalization(.none)
+								.disableAutocorrection(true)
+
+							TextField("手机号码", text: $userid_input)
+								.textFieldStyle(.plain)
+								.padding(.vertical, 18)
+								.padding(.horizontal, 10)
+								.background(Color(.secondarySystemBackground))
+								.cornerRadius(20)
+								.autocapitalization(.none)
+								.disableAutocorrection(true)
+							
+							Spacer()
+							
+							Button(action: {
+								DataManager.shared.login(
+									userName: name_input,
+									accessToken: accesstoken_input,
+									clientSecret: secret_input,
+									userID: userid_input
+								)
+							}) {
+								Text("登录")
+									.font(.headline)
+									.foregroundColor(.white)
+									.frame(maxWidth: .infinity)
+									.padding(.vertical, 18)
+									.background(canContinue ? .blue : Color(.systemGray3))
+									.cornerRadius(20)
+							}.padding(.bottom, 20)
+							
+
+						}.padding(.horizontal)
 					}
-				}
 			}
 			.navigationTitle("用户信息")
 		}

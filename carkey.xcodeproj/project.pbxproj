@@ -12,6 +12,7 @@
 		335DD43B2E74426100B0CE75 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */; };
 		335DD4422E74673100B0CE75 /* SwiftyBluetooth in Frameworks */ = {isa = PBXBuildFile; productRef = 335DD4412E74673100B0CE75 /* SwiftyBluetooth */; };
 		33A518D22E88BD1B0036C66D /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 33A518D12E88BD1B0036C66D /* CryptoSwift */; };
+		33F9079F2FDA56CD00741A4F /* BaoJunKey Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,7 +30,28 @@
 			remoteGlobalIDString = 331325DE2E6E869100E86E52;
 			remoteInfo = carkey;
 		};
+		33F9079D2FDA56CD00741A4F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 331325D72E6E869100E86E52 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33F907942FDA56CB00741A4F;
+			remoteInfo = "BaoJunKey Watch App";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		33F907A02FDA56CD00741A4F /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				33F9079F2FDA56CD00741A4F /* BaoJunKey Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		331325DF2E6E869100E86E52 /* carkey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carkey.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,6 +59,7 @@
 		331325F62E6E869200E86E52 /* carkeyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = carkeyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331F20AB2E84047100B19E7E /* carkey icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "carkey icon.icon"; sourceTree = "<group>"; };
 		335DD43A2E74426100B0CE75 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BaoJunKey Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -68,6 +91,11 @@
 			path = carkeyUITests;
 			sourceTree = "<group>";
 		};
+		33F907962FDA56CB00741A4F /* BaoJunKey Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "BaoJunKey Watch App";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +124,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33F907922FDA56CB00741A4F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -105,6 +140,7 @@
 				331325E12E6E869100E86E52 /* carkey */,
 				331325EF2E6E869200E86E52 /* carkeyTests */,
 				331325F92E6E869200E86E52 /* carkeyUITests */,
+				33F907962FDA56CB00741A4F /* BaoJunKey Watch App */,
 				335DD4392E74426100B0CE75 /* Frameworks */,
 				331325E02E6E869100E86E52 /* Products */,
 				331F20AB2E84047100B19E7E /* carkey icon.icon */,
@@ -117,6 +153,7 @@
 				331325DF2E6E869100E86E52 /* carkey.app */,
 				331325EC2E6E869200E86E52 /* carkeyTests.xctest */,
 				331325F62E6E869200E86E52 /* carkeyUITests.xctest */,
+				33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -139,10 +176,12 @@
 				331325DB2E6E869100E86E52 /* Sources */,
 				331325DC2E6E869100E86E52 /* Frameworks */,
 				331325DD2E6E869100E86E52 /* Resources */,
+				33F907A02FDA56CD00741A4F /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				33F9079E2FDA56CD00741A4F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				331325E12E6E869100E86E52 /* carkey */,
@@ -203,6 +242,28 @@
 			productReference = 331325F62E6E869200E86E52 /* carkeyUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		33F907942FDA56CB00741A4F /* BaoJunKey Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33F907A32FDA56CD00741A4F /* Build configuration list for PBXNativeTarget "BaoJunKey Watch App" */;
+			buildPhases = (
+				33F907912FDA56CB00741A4F /* Sources */,
+				33F907922FDA56CB00741A4F /* Frameworks */,
+				33F907932FDA56CB00741A4F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				33F907962FDA56CB00741A4F /* BaoJunKey Watch App */,
+			);
+			name = "BaoJunKey Watch App";
+			packageProductDependencies = (
+			);
+			productName = "BaoJunKey Watch App";
+			productReference = 33F907952FDA56CB00741A4F /* BaoJunKey Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -210,7 +271,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					331325DE2E6E869100E86E52 = {
@@ -223,6 +284,9 @@
 					331325F52E6E869200E86E52 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 331325DE2E6E869100E86E52;
+					};
+					33F907942FDA56CB00741A4F = {
+						CreatedOnToolsVersion = 26.5;
 					};
 				};
 			};
@@ -248,6 +312,7 @@
 				331325DE2E6E869100E86E52 /* carkey */,
 				331325EB2E6E869200E86E52 /* carkeyTests */,
 				331325F52E6E869200E86E52 /* carkeyUITests */,
+				33F907942FDA56CB00741A4F /* BaoJunKey Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -269,6 +334,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		331325F42E6E869200E86E52 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33F907932FDA56CB00741A4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -299,6 +371,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33F907912FDA56CB00741A4F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -311,6 +390,11 @@
 			isa = PBXTargetDependency;
 			target = 331325DE2E6E869100E86E52 /* carkey */;
 			targetProxy = 331325F72E6E869200E86E52 /* PBXContainerItemProxy */;
+		};
+		33F9079E2FDA56CD00741A4F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33F907942FDA56CB00741A4F /* BaoJunKey Watch App */;
+			targetProxy = 33F9079D2FDA56CD00741A4F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -576,6 +660,72 @@
 			};
 			name = Release;
 		};
+		33F907A12FDA56CD00741A4F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QV9R4FN97N;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BaoJunKey;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sleepyshark.carkey;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sleepyshark.carkey.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		33F907A22FDA56CD00741A4F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QV9R4FN97N;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BaoJunKey;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.sleepyshark.carkey;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sleepyshark.carkey.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -611,6 +761,15 @@
 			buildConfigurations = (
 				331326072E6E869200E86E52 /* Debug */,
 				331326082E6E869200E86E52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33F907A32FDA56CD00741A4F /* Build configuration list for PBXNativeTarget "BaoJunKey Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33F907A12FDA56CD00741A4F /* Debug */,
+				33F907A22FDA56CD00741A4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
